@@ -1,5 +1,1 @@
-﻿  main.cpp
-C:\Users\01\source\repos\ComputerGraphics\C\1_triangle\1_triangle\main.cpp(55,2): warning C4305: “初始化”: 从“double”到“float”截断
-C:\Users\01\source\repos\ComputerGraphics\C\1_triangle\1_triangle\main.cpp(64,2): warning C4305: “初始化”: 从“double”到“float”截断
-C:\Users\01\source\repos\ComputerGraphics\C\1_triangle\1_triangle\main.cpp(95,34): warning C4305: “参数”: 从“double”到“GLfloat”截断
-  1_triangle.vcxproj -> C:\Users\01\source\repos\ComputerGraphics\C\1_triangle\Debug\1_triangle.exe
+﻿
