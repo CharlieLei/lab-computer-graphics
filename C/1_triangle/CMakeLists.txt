@@ -14,7 +14,7 @@ add_executable(1_triangle
 
         Shader.h
 
-        vertex.glsl
+        triangleVertex.glsl
         triangleFrag.glsl
         quadrangleFrag.glsl)
 
