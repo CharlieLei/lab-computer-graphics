@@ -1,0 +1,3 @@
+C:/Users/01/source/repos/ComputerGraphics/C/1_triangle/cmake-build-debug/CMakeFiles/1_triangle.dir
+C:/Users/01/source/repos/ComputerGraphics/C/1_triangle/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/01/source/repos/ComputerGraphics/C/1_triangle/cmake-build-debug/CMakeFiles/rebuild_cache.dir
