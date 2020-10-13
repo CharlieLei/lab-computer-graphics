@@ -14,7 +14,7 @@ using namespace std;
 
 void processInput(GLFWwindow *window);
 
-unsigned int loadTexture(char const *path);
+unsigned int loadTexture(string path, GLint param);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -26,6 +26,17 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 // timing
 float deltaTime = 0.0;
 float lastFrame = 0.0;
+
+string paths[] = {
+        "../texture/bricks2.jpg",
+        "../texture/container.jpg",
+        "../texture/container2.png",
+        "../texture/marble.jpg",
+        "../texture/wall.jpg",
+        "../texture/wood.png",
+};
+
+unsigned int diffuseMaps[6];
 
 int main() {
     // glfw: initialize and configure
@@ -64,6 +75,22 @@ int main() {
     // ----------------------
     float faceVertices[][48] = {
             {
+                    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+                    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+                    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+                    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+                    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            },
+            {
+                    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+                    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            },
+            {
                     // positions          // normals           // texture coords
                     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
                     0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
@@ -73,28 +100,12 @@ int main() {
                     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
             },
             {
-                    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-                    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-                    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-                    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-                    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-                    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            },
-            {
                     -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
                     -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
                     -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
                     -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
                     -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                     -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            },
-            {
-                    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-                    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-                    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
             },
             {
                     -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
@@ -129,16 +140,9 @@ int main() {
         glEnableVertexAttribArray(2);
     }
 
-    // load and create a texture
-    // -------------------------
-    unsigned int diffuseMaps[] = {
-            loadTexture("../texture/bricks2.jpg"),
-            loadTexture("../texture/container.jpg"),
-            loadTexture("../texture/container2.png"),
-            loadTexture("../texture/marble.jpg"),
-            loadTexture("../texture/wall.jpg"),
-            loadTexture("../texture/wood.png"),
-    };
+    for (int i = 0; i < 6; i++) {
+        diffuseMaps[i] = loadTexture(paths[i], GL_NEAREST);
+    }
 
     // shader configuration
     // --------------------
@@ -215,14 +219,26 @@ void processInput(GLFWwindow *window) {
         camera.ProcessMouseMovement(0.0, 0.1);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         camera.ProcessMouseMovement(0.0, -0.1);
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        cout << "TEXTURE::LINEAR" << endl;
+        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR);
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        cout << "TEXTURE::MIPMAP" << endl;
+        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR_MIPMAP_LINEAR);
+    }
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        cout << "TEXTURE::NEAREST" << endl;
+        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_NEAREST);
+    }
 }
 
-unsigned int loadTexture(char const *path) {
+unsigned int loadTexture(string path, GLint param) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format;
         if (nrComponents == 1) format = GL_RED;
@@ -235,8 +251,8 @@ unsigned int loadTexture(char const *path) {
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
     } else {
         std::cerr << "Texture failed to load at path: " << path << std::endl;
     }
