@@ -25,6 +25,10 @@ const unsigned int SCR_HEIGHT = 600;
 float deltaTime = 0.0;
 float lastFrame = 0.0;
 
+bool showVertices = false;
+bool showMeshes = true;
+bool showFaces = false;
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
@@ -57,6 +61,7 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader shader("../shader/vertex.glsl", "../shader/fragment.glsl");
+    Shader faceShader("../shader/vertex.glsl", "../shader/faceFragment.glsl");
 
     // vertices of cubic
     // ----------------------
@@ -78,7 +83,7 @@ int main() {
 
         // render
         // ------
-        glClearColor(0.2, 0.3, 0.3, 1.0);
+        glClearColor(0.9, 0.9, 0.9, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model(1.0);
@@ -94,10 +99,25 @@ int main() {
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        // draw cubic
+        // draw
         // -------------
-        shader.use();
-        cube.Draw(shader);
+        if (showVertices) {
+            shader.use();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+            cube.Draw(shader);
+        }
+
+        if (showMeshes) {
+            shader.use();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            cube.Draw(shader);
+        }
+
+        if (showFaces) {
+            faceShader.use();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            cube.Draw(faceShader);
+        }
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -132,12 +152,26 @@ void processInput(GLFWwindow *window) {
 //    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 //        camera.ProcessMouseMovement(0.0, -0.1);
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        showVertices = false;
+        showMeshes = true;
+        showFaces = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        showVertices = true;
+        showMeshes = false;
+        showFaces = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        showVertices = false;
+        showMeshes = false;
+        showFaces = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+        showVertices = false;
+        showMeshes = true;
+        showFaces = true;
+    }
 }
 
 unsigned int loadTexture(string path, GLint param) {
