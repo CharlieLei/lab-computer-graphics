@@ -20,7 +20,6 @@ void Camera::ChangePosition(float xoffset, float yoffset) {
     phi += yoffset;
     if (phi < 0.001) phi = 0.001;
     else if (phi > 90.0) phi = 90.0;  // 防止万向节死锁
-    std::cout << "phiL" << phi << std::endl;
 
     updateCameraVectors();
 }

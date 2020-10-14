@@ -17,7 +17,7 @@
 
 struct Vertex {
     glm::vec3 Position;
-//    glm::vec3 Normal;
+    glm::vec3 Normal;
 };
 
 
@@ -32,7 +32,7 @@ public:
 private:
     unsigned int VAO, VBO, EBO;
     void setupMesh();
-    bool Model::loadObjFile(std::string &path);
+    bool loadObjFile(std::string &path);
 };
 
 

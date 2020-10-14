@@ -36,6 +36,9 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
+// lighting
+glm::vec3 lightPos(0.0, 2.0, 5.0);
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
@@ -70,7 +73,6 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader shader("../shader/vertex.glsl", "../shader/fragment.glsl");
-    Shader faceShader("../shader/vertex.glsl", "../shader/faceFragment.glsl");
 
     // vertices of cubic
     // ----------------------
@@ -91,7 +93,7 @@ int main() {
 
         // render
         // ------
-        glClearColor(0.9, 0.9, 0.9, 1.0);
+        glClearColor(0.1, 0.1, 0.1, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model(1.0);
@@ -107,38 +109,20 @@ int main() {
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-
-        model = glm::scale(model, glm::vec3(0.99, 0.99, 0.99));
-        faceShader.setMat4("model", model);
-        faceShader.setMat4("view", view);
-        faceShader.setMat4("projection", projection);
+        shader.setVec3("viewPos", camera.Position);
+        shader.setVec3("light.position", lightPos);
+        shader.setVec3("light.intensity", 1.0, 1.0, 1.0);
+        shader.setVec3("material.ambient", 0.1, 0.1, 0.1);
+        shader.setVec3("material.diffuse",  0.5, 0.5, 0.5);
+        shader.setVec3("material.specular", 1.0, 1.0, 1.0);
+        shader.setFloat("material.shininess", 32.0);
+        shader.setVec3("material.color", 1.0, 1.0, 0.0);
 
         // draw
         // -------------
-
-        if (showVertices) {
-            shader.use();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-            eightUniform.Draw(shader);
-            glDisable(GL_POLYGON_MODE);
-        }
-
-        if (showFaces) {
-//            glEnable(GL_POLYGON_OFFSET_FILL);
-//            glPolygonOffset(1.0, 1.0);
-            faceShader.use();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            eightUniform.Draw(faceShader);
-            glDisable(GL_POLYGON_MODE);
-        }
-
-        if (showMeshes) {
-            shader.use();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            eightUniform.Draw(shader);
-            glDisable(GL_POLYGON_MODE);
-        }
-
+        shader.use();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        eightUniform.Draw(shader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
