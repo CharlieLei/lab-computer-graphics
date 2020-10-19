@@ -39,6 +39,11 @@ public:
         waveID = loadTexture(wavePath, GL_REPEAT);
     }
 
+    void setTexture(Shader &shader) {
+        shader.use();
+        shader.setInt("skybox", 0);
+    }
+
     void Draw(Shader &shader, Camera &camera) {
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -66,7 +71,6 @@ public:
 
         // wave
         float dist = (float) glfwGetTime() * 0.1;
-        std::cout << dist << std::endl;
         texTranslate = glm::vec2(dist, dist);
         shader.setVec2("texTranslate", texTranslate);
         glActiveTexture(GL_TEXTURE0);

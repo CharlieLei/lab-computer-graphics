@@ -10,6 +10,7 @@
 #include "stb_image.h"
 #include "Camera.h"
 #include "SkyBoxTexture.h"
+#include "Terrain.h"
 
 using namespace std;
 
@@ -76,9 +77,11 @@ int main() {
     Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
     SkyBoxTexture skyBoxTexture;
 
+    Shader terrainShader("../shader/terrainVertex.glsl", "../shader/terrainFrag.glsl");
+    Terrain terrain;
 
-    skyboxShader.use();
-    skyboxShader.setInt("skybox", 0);
+//    skyBoxTexture.setTexture(skyboxShader);
+    terrain.setTexture(terrainShader);
 
     // render loop
     // -----------
@@ -99,7 +102,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw skybox as last
-        skyBoxTexture.Draw(skyboxShader, camera);
+        terrain.Draw(terrainShader, camera);
+//        skyBoxTexture.Draw(skyboxShader, camera);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
