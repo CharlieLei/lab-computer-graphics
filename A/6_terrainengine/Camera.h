@@ -16,6 +16,7 @@ const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
+const float ASPECT = 800.0 / 600.0;
 
 class Camera {
 public:
@@ -32,19 +33,17 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+    float Aspect;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-           float yaw = YAW, float pitch = PITCH);
-
-    // constructor with scalar values
-    Camera(float posX, float posY, float posZ,
-           float upX, float upY, float upZ,
-           float yaw, float pitch);
+           float yaw = YAW, float pitch = PITCH, float aspect = ASPECT);
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix();
+
+    glm::mat4 GetProjectionMatrix();
 
     // processes input received from any keyboard-like input system.
     // Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
