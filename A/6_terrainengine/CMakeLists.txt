@@ -15,6 +15,6 @@ add_executable(6_terrainengine
         Shader.h
         Shader.cpp
         Camera.cpp
-        Camera.h)
+        Camera.h SkyBoxTexture.h)
 
 target_link_libraries(6_terrainengine opengl32 glfw3)

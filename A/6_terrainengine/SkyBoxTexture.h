@@ -8,9 +8,9 @@
 #define DIMENSION 30
 #define FACES 5
 
-#define LENGTH 500.0
-#define WIDTH 600.0
-#define HEIGHT 300.0
+#define LENGTH 50.0
+#define WIDTH 60.0
+#define HEIGHT 30.0
 
 #include <glad/glad.h>
 #include <vector>
@@ -21,14 +21,17 @@
 class SkyBoxTexture {
 public:
     unsigned int IDs[FACES]; //frontID, backID, leftID, rightID, UpID;
+    unsigned int waveID;
 
     SkyBoxTexture() {
         setupVertices();
+        setupWaveVertices();
 
         // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
         stbi_set_flip_vertically_on_load(true);
         for (int i = 0; i < FACES; i++)
-            IDs[i] = loadTexture(paths[i]);
+            IDs[i] = loadTexture(paths[i], GL_CLAMP_TO_EDGE);
+        waveID = loadTexture(wavePath, GL_REPEAT);
     }
 
     void Draw(Shader shader) {
@@ -40,10 +43,15 @@ public:
             glBindVertexArray(VAOs[i]);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, waveID);
+        glBindVertexArray(waveVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
 private:
     unsigned int VAOs[FACES], VBOs[FACES];
+    unsigned int waveVAO, waveVBO;
 
     std::vector<std::string> paths = {
             "../texture/SkyBox/SkyBox0.bmp",
@@ -52,6 +60,8 @@ private:
             "../texture/SkyBox/SkyBox1.bmp",
             "../texture/SkyBox/SkyBox4.bmp"
     };
+
+    std::string wavePath = "../texture/SkyBox/SkyBox5.bmp";
 
     float vertices[FACES][DIMENSION] = {
             // front
@@ -101,6 +111,15 @@ private:
             },
     };
 
+    float waveVertices[DIMENSION] = {
+            LENGTH, 0.0, -WIDTH, 10.0, 10.0,
+            LENGTH, 0.0, WIDTH, 10.0, 0.0,
+            -LENGTH, 0.0, WIDTH, 0.0, 0.0,
+            -LENGTH, 0.0, WIDTH, 0.0, 0.0,
+            -LENGTH, 0.0, -WIDTH, 0.0, 10.0,
+            LENGTH, 0.0, -WIDTH, 10.0, 10.0,
+    };
+
     void setupVertices() {
         glGenVertexArrays(FACES, VAOs);
         glGenBuffers(FACES, VBOs);
@@ -116,7 +135,20 @@ private:
         }
     }
 
-    unsigned int loadTexture(std::string &path) {
+    void setupWaveVertices() {
+        glGenVertexArrays(1, &waveVAO);
+        glGenBuffers(1, &waveVBO);
+
+        glBindVertexArray(waveVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, waveVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(waveVertices), waveVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    }
+
+    unsigned int loadTexture(std::string &path, GLenum param) {
         unsigned int textureID;
         glGenTextures(1, &textureID);
 
@@ -135,8 +167,8 @@ private:
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, param);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, param);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
