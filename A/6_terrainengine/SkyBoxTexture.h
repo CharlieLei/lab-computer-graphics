@@ -7,6 +7,7 @@
 
 #define DIMENSION 30
 #define FACES 5
+#define UP_FACE 4
 
 #define LENGTH 50.0
 #define WIDTH 60.0
@@ -58,6 +59,11 @@ public:
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
+
+        glDepthMask(GL_FALSE);
+        glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR); // 设置混色函数取得半透明效果
+        glEnable(GL_BLEND);
+
         // wave
         float dist = (float) glfwGetTime() * 0.1;
         std::cout << dist << std::endl;
@@ -67,6 +73,22 @@ public:
         glBindTexture(GL_TEXTURE_2D, waveID);
         glBindVertexArray(waveVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // reflection of the upper sky
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(1.0, -1.0, 1.0));
+        texTranslate = glm::vec2(0.0, 0.0);
+        shader.setVec2("texTranslate", texTranslate);
+        shader.setMat4("model", model);
+        for (int i = 0; i < FACES; i++) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, IDs[i]);
+            glBindVertexArray(VAOs[i]);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+
+        glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
     }
 
 private:
