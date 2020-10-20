@@ -28,7 +28,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 2.0f, 0.0f));
+Camera camera(glm::vec3(5.0f, 10.0f, 5.0f));
 float lastX = (float) SCR_WIDTH / 2.0;
 float lastY = (float) SCR_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -74,8 +74,8 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
-    SkyBoxTexture skyBoxTexture;
+//    Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
+//    SkyBoxTexture skyBoxTexture;
 
     Shader terrainShader("../shader/terrainVertex.glsl", "../shader/terrainFrag.glsl");
     Terrain terrain;

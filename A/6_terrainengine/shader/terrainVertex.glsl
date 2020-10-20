@@ -8,11 +8,8 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
-uniform sampler2D heightTexture;
-
 void main()
 {
     TexCoords = aTexCoords;
-    vec4 height = texture(heightTexture, TexCoords) * 10.0;
-    gl_Position = projection * view * model * (vec4(aPos, 1.0) + height);
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

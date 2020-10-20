@@ -13,18 +13,24 @@
 
 #define DIMENSION 30
 
-#define LENGTH 10.0
-#define WIDTH 10.0
+#define LENGTH 10.0 // x axis
+#define WIDTH 10.0  // z axis
+#define LENGTH_PIXEL_NUM 100
+#define WIDTH_PIXEL_NUM 100
+
+struct Vertex {
+    glm::vec3 Position;
+    glm::vec2 TexCoords;
+};
 
 class Terrain {
 public:
-    unsigned int heightTextureID, terrainTextureID;
+    unsigned int terrainTextureID;
 
     Terrain() {
-        setupVertices();
         // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
         stbi_set_flip_vertically_on_load(true);
-        heightTextureID = loadTexture(heightPath, GL_CLAMP_TO_EDGE);
+        setupVertices();
         terrainTextureID = loadTexture(terrainPath, GL_CLAMP_TO_EDGE);
     }
 
@@ -44,15 +50,10 @@ public:
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, heightTextureID);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, terrainTextureID);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
 
 private:
@@ -61,25 +62,70 @@ private:
     const char *heightPath = "../texture/heightmap.bmp";
     const char *terrainPath = "../texture/terrain-texture3.bmp";
 
-    float vertices[DIMENSION] = {
-        -LENGTH, 0.0, WIDTH, 0.0, 0.0,
-        LENGTH, 0.0, WIDTH, 1.0, 0.0,
-        LENGTH, 0.0, -WIDTH, 1.0, 1.0,
-        -LENGTH, 0.0, WIDTH, 0.0, 0.0,
-        -LENGTH, 0.0, -WIDTH, 0.0, 1.0,
-        LENGTH, 0.0, -WIDTH, 1.0, 1.0
-    };
+    std::vector<Vertex> vertices; // 每个像素需要6个点，每个点需要5个float值
 
     void setupVertices() {
+        unsigned char *heightmapData;
+        int heightmapWidth, heightmapHeight, heightmapNrComponents;
+        heightmapData = stbi_load(heightPath, &heightmapWidth, &heightmapHeight, &heightmapNrComponents, 0);
+        if (heightmapData == nullptr) {
+            std::cerr << "Texture failed to load at path: " << heightPath << std::endl;
+            return;
+        }
+
+//        std::cout << "------------------" << std::endl;
+//        for (int i = 0; i < heightmapHeight; i++) {
+//            for (int j = 0; j < heightmapWidth; j++) {
+//                std::cout << (int)heightmapData[i * heightmapHeight + j] << " ";
+//            }
+//            std:: cout << std::endl;
+//            std:: cout << std::endl;
+//        }
+//        std::cout << "------------------" << std::endl;
+
+
+        int offsets[6][2] = {
+                {0, 0},
+                {1, 0},
+                {1, 1},
+                {0, 0},
+                {0, 1},
+                {1, 1}
+        };
+
+        float lengthInterval = LENGTH / (float) LENGTH_PIXEL_NUM;
+        float widthInterval = WIDTH / (float) WIDTH_PIXEL_NUM;
+        for (int i = 0; i < LENGTH_PIXEL_NUM; i++) {
+            for (int j = 0; j < WIDTH_PIXEL_NUM; j++) {
+                for (int k = 0; k < 6; k++) {
+                    float x = lengthInterval * (i + offsets[k][0]), z = widthInterval * (j + offsets[k][1]);
+                    float u = x / (LENGTH), v = 1.0 - z / (WIDTH);
+                    int heightmap_u = u * heightmapHeight, heightmap_v = v * heightmapWidth;
+                    float y = heightmapData[heightmap_u * heightmapHeight + heightmap_v] / 50.0;
+
+                    Vertex vertex{glm::vec3(x, y, z), glm::vec2(u, v)};
+                    vertices.push_back(vertex);
+                }
+            }
+        }
+//
+//        for (int i = 0; i < vertices.size(); i++) {
+//            if (i > 0 && i % 6 == 0) std::cout << std::endl;
+//            std::cout << vertices[i].Position.x << " " << vertices[i].Position.y << " " << vertices[i].Position.z << " "
+//                      << vertices[i].TexCoords.x << " " << vertices[i].TexCoords.y << std::endl;
+//        }
+
+        stbi_image_free(heightmapData);
+
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) nullptr);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
     }
 
     unsigned int loadTexture(const char *path, GLenum param) {
