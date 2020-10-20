@@ -15,8 +15,8 @@
 
 #define LENGTH 10.0 // x axis
 #define WIDTH 10.0  // z axis
-#define LENGTH_PIXEL_NUM 100
-#define WIDTH_PIXEL_NUM 100
+#define LENGTH_VERTEX_NUM 20
+#define WIDTH_VERTEX_NUM 20
 
 struct Vertex {
     glm::vec3 Position;
@@ -53,18 +53,21 @@ public:
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, terrainTextureID);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
     }
 
 private:
-    unsigned int VAO, VBO;
+    unsigned int VAO, VBO, EBO;
 
     const char *heightPath = "../texture/heightmap.bmp";
     const char *terrainPath = "../texture/terrain-texture3.bmp";
 
     std::vector<Vertex> vertices; // 每个像素需要6个点，每个点需要5个float值
+    std::vector<unsigned int> indices;
 
     void setupVertices() {
+        stbi_set_flip_vertically_on_load(true);
         unsigned char *heightmapData;
         int heightmapWidth, heightmapHeight, heightmapNrComponents;
         heightmapData = stbi_load(heightPath, &heightmapWidth, &heightmapHeight, &heightmapNrComponents, 0);
@@ -83,45 +86,54 @@ private:
 //        }
 //        std::cout << "------------------" << std::endl;
 
+        float lengthInterval = LENGTH / (float) (LENGTH_VERTEX_NUM-1);
+        float widthInterval = WIDTH / (float) (WIDTH_VERTEX_NUM-1);
+        for (int i = 0; i < LENGTH_VERTEX_NUM; i++) {
+            for (int j = 0; j < WIDTH_VERTEX_NUM; j++) {
+                float x = lengthInterval * i, z = widthInterval * j;
+                float u = x / (LENGTH), v = 1.0 - z / (WIDTH);
+                int heightmap_u = u * heightmapHeight, heightmap_v = v * heightmapWidth;
+                float y = heightmapData[heightmap_u * heightmapHeight + heightmap_v] / 256.0 * 1.0;
 
-        int offsets[6][2] = {
-                {0, 0},
-                {1, 0},
-                {1, 1},
-                {0, 0},
-                {0, 1},
-                {1, 1}
-        };
-
-        float lengthInterval = LENGTH / (float) LENGTH_PIXEL_NUM;
-        float widthInterval = WIDTH / (float) WIDTH_PIXEL_NUM;
-        for (int i = 0; i < LENGTH_PIXEL_NUM; i++) {
-            for (int j = 0; j < WIDTH_PIXEL_NUM; j++) {
-                for (int k = 0; k < 6; k++) {
-                    float x = lengthInterval * (i + offsets[k][0]), z = widthInterval * (j + offsets[k][1]);
-                    float u = x / (LENGTH), v = 1.0 - z / (WIDTH);
-                    int heightmap_u = u * heightmapHeight, heightmap_v = v * heightmapWidth;
-                    float y = heightmapData[heightmap_u * heightmapHeight + heightmap_v] / 50.0;
-
-                    Vertex vertex{glm::vec3(x, y, z), glm::vec2(u, v)};
-                    vertices.push_back(vertex);
-                }
+                Vertex vertex{glm::vec3(x, z, y), glm::vec2(u, v)};
+                vertices.push_back(vertex);
             }
         }
-//
-//        for (int i = 0; i < vertices.size(); i++) {
-//            if (i > 0 && i % 6 == 0) std::cout << std::endl;
-//            std::cout << vertices[i].Position.x << " " << vertices[i].Position.y << " " << vertices[i].Position.z << " "
-//                      << vertices[i].TexCoords.x << " " << vertices[i].TexCoords.y << std::endl;
-//        }
+
+        for (int i = 0; i < LENGTH_VERTEX_NUM-1; i++) {
+            for (int j = 0; j < WIDTH_VERTEX_NUM-1; j++) {
+                indices.push_back(j * (WIDTH_VERTEX_NUM) + i);
+                indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + i);
+                indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + (i+1));
+
+                indices.push_back(j * (WIDTH_VERTEX_NUM) + i);
+                indices.push_back(j * (WIDTH_VERTEX_NUM) + (i+1));
+                indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + (i+1));
+            }
+        }
+
+        std::cout << "-----------vertices--------------" << std::endl;
+        for (int i = 0; i < vertices.size(); i++) {
+            std::cout << i << " " << vertices[i].Position.x << " " << vertices[i].Position.y << " " << vertices[i].Position.z << " "
+                      << vertices[i].TexCoords.x << " " << vertices[i].TexCoords.y << std::endl;
+        }
+        std::cout << "-----------indices---------------" << std::endl;
+        for (int i = 0; i < indices.size(); i++) {
+            if (i > 0 && i % 3 == 0) std::cout << std::endl;
+            if (i > 0 && i % 6 == 0) std::cout << std::endl;
+            std::cout << indices[i] << " ";
+        }
 
         stbi_image_free(heightmapData);
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) nullptr);
         glEnableVertexAttribArray(1);
