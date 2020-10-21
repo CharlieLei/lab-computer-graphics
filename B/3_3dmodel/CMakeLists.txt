@@ -8,6 +8,6 @@ include_directories(include)
 
 link_directories(lib/glfw)
 
-add_executable(3_3dmodel glad.c main.cpp ObjLoader.cpp ObjLoader.h Model.cpp Model.h Camera.cpp Camera.h Shader.cpp Shader.h stb_image.cpp stb_image.h)
+add_executable(3_3dmodel glad.c main.cpp Model.cpp Model.h Camera.cpp Camera.h Shader.cpp Shader.h stb_image.cpp stb_image.h)
 
 target_link_libraries(3_3dmodel opengl32 glfw3)
