@@ -5,7 +5,6 @@
 #ifndef LEARNOPENGL_SHADER_H
 #define LEARNOPENGL_SHADER_H
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <fstream>
@@ -16,7 +15,7 @@ class Shader {
 public:
     unsigned int ID;
 
-    Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
+    Shader(const char *vertexPath, const char *fragmentPath);
     void use();
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
@@ -32,7 +31,7 @@ public:
     void setMat4(const std::string &name, const glm::mat4 &mat) const;
 
 private:
-    static void checkCompileErrors(GLuint shader, const std::string& type);
+    static void checkCompileErrors(unsigned int shader, const std::string& type);
 };
 
 

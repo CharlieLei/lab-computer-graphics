@@ -1,12 +1,23 @@
 #include "Camera.h"
+#include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float aspect)
+Camera::Camera(const unsigned int scrWidth, const unsigned int scrHeight,
+               glm::vec3 position, glm::vec3 up, float yaw, float pitch)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM){
+    ScrWidth = scrWidth;
+    ScrHeight = scrHeight;
+
     Position = position;
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
-    Aspect = aspect;
+    Aspect = (float) ScrWidth / (float) ScrHeight;
+
+    LastX = (float) ScrWidth / 2.0;
+    LastY = (float) ScrHeight / 2.0;
+
+    FirstMouse = true;
+
     updateCameraVectors();
 }
 
@@ -18,15 +29,27 @@ glm::mat4 Camera::GetProjectionMatrix() {
     return glm::perspective(glm::radians(Zoom), Aspect, 0.1f,200.0f);
 }
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-    float velocity = MovementSpeed * deltaTime;
+void Camera::ProcessKeyboard(Camera_Movement direction) {
+    float velocity = MovementSpeed * Timer::deltaTime;
     if (direction == FORWARD) Position += velocity * Front;
     else if (direction == BACKWARD) Position -= velocity * Front;
     else if (direction == LEFT) Position -= velocity * Right;
     else if (direction == RIGHT) Position += velocity * Right;
 }
 
-void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
+void Camera::ProcessMouseMovement(double xpos, double ypos, bool constrainPitch) {
+    if (FirstMouse) {
+        LastX = xpos;
+        LastY = ypos;
+        FirstMouse = false;
+    }
+
+    float xoffset = xpos - LastX;
+    float yoffset = LastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    LastX = xpos;
+    LastY = ypos;
+
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
 
@@ -42,7 +65,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     updateCameraVectors();
 }
 
-void Camera::ProcessMouseScroll(float yoffset) {
+void Camera::ProcessMouseScroll(double yoffset) {
     Zoom -= yoffset;
     if (Zoom < 1.0f) Zoom = 1.0f;
     else if (Zoom > 45.0f) Zoom = 45.0f;
