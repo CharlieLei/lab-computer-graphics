@@ -34,7 +34,8 @@ unsigned int Texture::loadTexture(const char *path, GLenum param) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
         std::cout << "Texture succeeded to load at path: " << path
-                  << " | params(width, height, channels): " << width << " " << height << " " << nrComponents << std::endl;
+                  << " | params(width, height, channels): " << width << " " << height << " " << nrComponents
+                  << std::endl;
         stbi_image_free(data);
     } else {
         std::cerr << "Texture failed to load at path: " << path << std::endl;

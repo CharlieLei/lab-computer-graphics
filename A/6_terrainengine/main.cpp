@@ -64,12 +64,12 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
-    Skybox skyBoxTexture;
+    Skybox skybox;
 
     Shader terrainShader("../shader/terrainVertex.glsl", "../shader/terrainFrag.glsl");
     Terrain terrain;
 
-    skyBoxTexture.setTexture(skyboxShader);
+    skybox.setTexture(skyboxShader);
     terrain.setTexture(terrainShader);
 
     // render loop
@@ -89,10 +89,10 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw skybox as last
-        skyBoxTexture.DrawSky(skyboxShader, camera);
+        skybox.DrawSky(skyboxShader, camera);
         terrain.Draw(terrainShader, camera);
 
-        skyBoxTexture.DrawReflection(skyboxShader, camera);
+        skybox.DrawReflection(skyboxShader, camera);
         terrain.DrawReflection(terrainShader, camera);
 
         glDepthMask(GL_FALSE);
@@ -100,7 +100,7 @@ int main() {
         glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA); // 设置混色函数取得半透明效果
         glEnable(GL_BLEND);
 
-        skyBoxTexture.DrawWave(skyboxShader, camera);
+        skybox.DrawWave(skyboxShader, camera);
 
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);

@@ -89,13 +89,13 @@ void Terrain::setupVertices() {
 //            std:: cout << std::endl;
 //        }
 
-    float lengthInterval = LENGTH / (float) (LENGTH_VERTEX_NUM-1);
-    float widthInterval = WIDTH / (float) (WIDTH_VERTEX_NUM-1);
+    float lengthInterval = LENGTH / (float) (LENGTH_VERTEX_NUM - 1);
+    float widthInterval = WIDTH / (float) (WIDTH_VERTEX_NUM - 1);
     for (int i = 0; i < LENGTH_VERTEX_NUM; i++) {
         for (int j = 0; j < WIDTH_VERTEX_NUM; j++) {
             float x = lengthInterval * i, z = widthInterval * j;
             float u = x / (LENGTH), v = z / (WIDTH);
-            int heightmap_u = u * (heightmapHeight-1), heightmap_v = v * (heightmapWidth-1);
+            int heightmap_u = u * (heightmapHeight - 1), heightmap_v = v * (heightmapWidth - 1);
             float y = heightmapData[heightmap_v * heightmapWidth + heightmap_u] / 256.0 * 1.0 - DOWN_OFFSET;
 
             Vertex vertex{glm::vec3(x, y, z), glm::vec2(u, v)};
@@ -103,15 +103,15 @@ void Terrain::setupVertices() {
         }
     }
 
-    for (int i = 0; i < LENGTH_VERTEX_NUM-1; i++) {
-        for (int j = 0; j < WIDTH_VERTEX_NUM-1; j++) {
+    for (int i = 0; i < LENGTH_VERTEX_NUM - 1; i++) {
+        for (int j = 0; j < WIDTH_VERTEX_NUM - 1; j++) {
             indices.push_back(j * (WIDTH_VERTEX_NUM) + i);
-            indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + i);
-            indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + (i+1));
+            indices.push_back((j + 1) * (WIDTH_VERTEX_NUM) + i);
+            indices.push_back((j + 1) * (WIDTH_VERTEX_NUM) + (i + 1));
 
             indices.push_back(j * (WIDTH_VERTEX_NUM) + i);
-            indices.push_back(j * (WIDTH_VERTEX_NUM) + (i+1));
-            indices.push_back((j+1) * (WIDTH_VERTEX_NUM) + (i+1));
+            indices.push_back(j * (WIDTH_VERTEX_NUM) + (i + 1));
+            indices.push_back((j + 1) * (WIDTH_VERTEX_NUM) + (i + 1));
         }
     }
 

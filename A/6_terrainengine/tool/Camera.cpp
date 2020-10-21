@@ -3,7 +3,7 @@
 
 Camera::Camera(const unsigned int scrWidth, const unsigned int scrHeight,
                glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-        : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM){
+        : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
     ScrWidth = scrWidth;
     ScrHeight = scrHeight;
 
@@ -26,7 +26,7 @@ glm::mat4 Camera::GetViewMatrix() {
 }
 
 glm::mat4 Camera::GetProjectionMatrix() {
-    return glm::perspective(glm::radians(Zoom), Aspect, 0.1f,200.0f);
+    return glm::perspective(glm::radians(Zoom), Aspect, 0.1f, 200.0f);
 }
 
 void Camera::ProcessKeyboard(Camera_Movement direction) {

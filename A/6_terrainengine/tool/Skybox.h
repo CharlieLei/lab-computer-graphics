@@ -46,48 +46,48 @@ private:
     float vertices[FACES][DIMENSION] = {
             // front
             {
-                    LENGTH, 2 * HEIGHT, -WIDTH, 1.0, 1.0,
-                    LENGTH, 0.0, -WIDTH, 1.0, 0.0,
-                    -LENGTH, 0.0, -WIDTH, 0.0, 0.0,
-                    -LENGTH, 0.0, -WIDTH, 0.0, 0.0,
+                    LENGTH,  2 * HEIGHT, -WIDTH, 1.0, 1.0,
+                    LENGTH,  0.0,        -WIDTH, 1.0, 0.0,
+                    -LENGTH, 0.0,        -WIDTH, 0.0, 0.0,
+                    -LENGTH, 0.0,        -WIDTH, 0.0, 0.0,
                     -LENGTH, 2 * HEIGHT, -WIDTH, 0.0, 1.0,
-                    LENGTH, 2 * HEIGHT, -WIDTH, 1.0, 1.0
+                    LENGTH,  2 * HEIGHT, -WIDTH, 1.0, 1.0
             },
             // back
             {
-                    -LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0,
-                    -LENGTH, 0.0, WIDTH, 1.0, 0.0,
-                    LENGTH, 0.0, WIDTH, 0.0, 0.0,
-                    LENGTH, 0.0, WIDTH, 0.0, 0.0,
-                    LENGTH, 2 * HEIGHT, WIDTH, 0.0, 1.0,
-                    -LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0
+                    -LENGTH, 2 * HEIGHT, WIDTH,  1.0, 1.0,
+                    -LENGTH, 0.0,        WIDTH,  1.0, 0.0,
+                    LENGTH,  0.0,        WIDTH,  0.0, 0.0,
+                    LENGTH,  0.0,        WIDTH,  0.0, 0.0,
+                    LENGTH,  2 * HEIGHT, WIDTH,  0.0, 1.0,
+                    -LENGTH, 2 * HEIGHT, WIDTH,  1.0, 1.0
             },
             // left
             {
                     -LENGTH, 2 * HEIGHT, -WIDTH, 1.0, 1.0,
-                    -LENGTH, 0.0, -WIDTH, 1.0, 0.0,
-                    -LENGTH, 0.0, WIDTH, 0.0, 0.0,
-                    -LENGTH, 0.0, WIDTH, 0.0, 0.0,
-                    -LENGTH, 2 * HEIGHT, WIDTH, 0.0, 1.0,
+                    -LENGTH, 0.0,        -WIDTH, 1.0, 0.0,
+                    -LENGTH, 0.0,        WIDTH,  0.0, 0.0,
+                    -LENGTH, 0.0,        WIDTH,  0.0, 0.0,
+                    -LENGTH, 2 * HEIGHT, WIDTH,  0.0, 1.0,
                     -LENGTH, 2 * HEIGHT, -WIDTH, 1.0, 1.0
             },
             // right
             {
-                    LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0,
-                    LENGTH, 0.0, WIDTH, 1.0, 0.0,
-                    LENGTH, 0.0, -WIDTH, 0.0, 0.0,
-                    LENGTH, 0.0, -WIDTH, 0.0, 0.0,
-                    LENGTH, 2 * HEIGHT, -WIDTH, 0.0, 1.0,
-                    LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0
+                    LENGTH,  2 * HEIGHT, WIDTH,  1.0, 1.0,
+                    LENGTH,  0.0,        WIDTH,  1.0, 0.0,
+                    LENGTH,  0.0,        -WIDTH, 0.0, 0.0,
+                    LENGTH,  0.0,        -WIDTH, 0.0, 0.0,
+                    LENGTH,  2 * HEIGHT, -WIDTH, 0.0, 1.0,
+                    LENGTH,  2 * HEIGHT, WIDTH,  1.0, 1.0
             },
             // up
             {
-                    LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0,
-                    LENGTH, 2 * HEIGHT, -WIDTH, 1.0, 0.0,
+                    LENGTH,  2 * HEIGHT, WIDTH,  1.0, 1.0,
+                    LENGTH,  2 * HEIGHT, -WIDTH, 1.0, 0.0,
                     -LENGTH, 2 * HEIGHT, -WIDTH, 0.0, 0.0,
                     -LENGTH, 2 * HEIGHT, -WIDTH, 0.0, 0.0,
-                    -LENGTH, 2 * HEIGHT, WIDTH, 0.0, 1.0,
-                    LENGTH, 2 * HEIGHT, WIDTH, 1.0, 1.0
+                    -LENGTH, 2 * HEIGHT, WIDTH,  0.0, 1.0,
+                    LENGTH,  2 * HEIGHT, WIDTH,  1.0, 1.0
             },
     };
 

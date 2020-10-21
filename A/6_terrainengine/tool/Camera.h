@@ -1,5 +1,6 @@
 #ifndef LEARNOPENGL_CAMERA_H
 #define LEARNOPENGL_CAMERA_H
+
 #include <glm/glm.hpp>
 #include <vector>
 #include "Timer.h"
