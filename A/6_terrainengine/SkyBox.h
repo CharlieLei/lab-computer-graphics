@@ -2,8 +2,8 @@
 // Created by 01 on 2020/10/19.
 //
 
-#ifndef INC_6_TERRAINENGINE_SKYBOXTEXTURE_H
-#define INC_6_TERRAINENGINE_SKYBOXTEXTURE_H
+#ifndef INC_6_TERRAINENGINE_SKYBOX_H
+#define INC_6_TERRAINENGINE_SKYBOX_H
 
 #define DIMENSION 30
 #define FACES 5
@@ -23,12 +23,12 @@
 #include "Shader.h"
 #include "Camera.h"
 
-class SkyBoxTexture {
+class SkyBox {
 public:
     unsigned int IDs[FACES]; //frontID, backID, leftID, rightID, UpID;
     unsigned int waveID;
 
-    SkyBoxTexture() {
+    SkyBox() {
         setupVertices();
         setupWaveVertices();
 
@@ -44,55 +44,63 @@ public:
         shader.setInt("skybox", 0);
     }
 
-    void Draw(Shader &shader, Camera &camera) {
+    void DrawSky(Shader &shader, Camera &camera) {
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = camera.GetProjectionMatrix();
         glm::vec2 texTranslate = glm::vec2(0.0f);
 
         shader.use();
-        // sky
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
         shader.setVec2("texTranslate", texTranslate);
-        //shader.setInt("skybox", 0);
+
         for (int i = 0; i < FACES; i++) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, IDs[i]);
             glBindVertexArray(VAOs[i]);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
+    }
 
-
-        glDepthMask(GL_FALSE);
-        glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR); // 设置混色函数取得半透明效果
-        glEnable(GL_BLEND);
-
-        // wave
+    void DrawWave(Shader &shader, Camera &camera) {
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = camera.GetProjectionMatrix();
         float dist = (float) glfwGetTime() * 0.1;
-        texTranslate = glm::vec2(dist, dist);
+        glm::vec2 texTranslate = glm::vec2(dist, dist);
+
+        shader.use();
+        shader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
         shader.setVec2("texTranslate", texTranslate);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, waveID);
         glBindVertexArray(waveVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 
-        // reflection of the upper sky
-        model = glm::mat4(1.0f);
+    void DrawReflection(Shader &shader, Camera &camera) {
+        glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(1.0, -1.0, 1.0));
-        texTranslate = glm::vec2(0.0, 0.0);
-        shader.setVec2("texTranslate", texTranslate);
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = camera.GetProjectionMatrix();
+        glm::vec2 texTranslate = glm::vec2(0.0f);
+
         shader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+        shader.setVec2("texTranslate", texTranslate);
+
         for (int i = 0; i < FACES; i++) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, IDs[i]);
             glBindVertexArray(VAOs[i]);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
-
-        glDisable(GL_BLEND);
-        glDepthMask(GL_TRUE);
     }
 
 private:
@@ -229,4 +237,4 @@ private:
 };
 
 
-#endif //INC_6_TERRAINENGINE_SKYBOXTEXTURE_H
+#endif //INC_6_TERRAINENGINE_SKYBOX_H

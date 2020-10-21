@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "stb_image.h"
 #include "Camera.h"
-#include "SkyBoxTexture.h"
+#include "SkyBox.h"
 #include "Terrain.h"
 
 using namespace std;
@@ -74,13 +74,13 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-//    Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
-//    SkyBoxTexture skyBoxTexture;
+    Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
+    SkyBox skyBoxTexture;
 
     Shader terrainShader("../shader/terrainVertex.glsl", "../shader/terrainFrag.glsl");
     Terrain terrain;
 
-//    skyBoxTexture.setTexture(skyboxShader);
+    skyBoxTexture.setTexture(skyboxShader);
     terrain.setTexture(terrainShader);
 
     // render loop
@@ -102,8 +102,21 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw skybox as last
+        skyBoxTexture.DrawSky(skyboxShader, camera);
         terrain.Draw(terrainShader, camera);
-//        skyBoxTexture.Draw(skyboxShader, camera);
+
+        skyBoxTexture.DrawReflection(skyboxShader, camera);
+        terrain.DrawReflection(terrainShader, camera);
+
+        glDepthMask(GL_FALSE);
+        glBlendColor(0.0, 0.0, 0.0, 0.8); // 设置source的alpha值
+        glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA); // 设置混色函数取得半透明效果
+        glEnable(GL_BLEND);
+
+        skyBoxTexture.DrawWave(skyboxShader, camera);
+
+        glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

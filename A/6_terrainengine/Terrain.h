@@ -25,36 +25,71 @@ struct Vertex {
 
 class Terrain {
 public:
-    unsigned int terrainTextureID;
+    unsigned int terrainTextureID, detailTextureID;
 
     Terrain() {
         // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
         stbi_set_flip_vertically_on_load(true);
         setupVertices();
         terrainTextureID = loadTexture(terrainPath, GL_CLAMP_TO_EDGE);
+        detailTextureID = loadTexture(terrainDetailPath, GL_MIRRORED_REPEAT);
     }
 
     void setTexture(Shader &shader) {
         shader.use();
-        shader.setInt("heightTexture", 0);
-        shader.setInt("terrainTexture", 1);
+        shader.setInt("terrainTexture", 0);
+        shader.setInt("detailTexture", 1);
     }
 
     void Draw(Shader &shader, Camera &camera) {
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = camera.GetProjectionMatrix();
+        glm::vec4 clipPlane = glm::vec4(0.0, 1.0, 0.0, 0.0);
 
         shader.use();
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        shader.setVec4("clipPlane", clipPlane);
 
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, terrainTextureID);
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, detailTextureID);
+
+        // draw island
+//        glEnable(GL_CLIP_DISTANCE0);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
+//        glDisable(GL_CLIP_DISTANCE0);
+    }
+
+    void DrawReflection(Shader &shader, Camera &camera) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0, 0.35, 0.0));
+        model = glm::scale(model, glm::vec3(1.0, -1.0, 1.0));
+        model = glm::translate(model, glm::vec3(0.0, 0.3, 0.0));
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = camera.GetProjectionMatrix();
+        glm::vec4 clipPlane = glm::vec4(0.0, -1.0, 0.0, 0.0);
+
+        shader.use();
+        shader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+        shader.setVec4("clipPlane", clipPlane);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID);
+        glEnable(GL_CLIP_DISTANCE0);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+        glDisable(GL_CLIP_DISTANCE0);
     }
 
 private:
@@ -62,6 +97,7 @@ private:
 
     const char *heightPath = "../texture/heightmap.bmp";
     const char *terrainPath = "../texture/terrain-texture3.bmp";
+    const char *terrainDetailPath = "../texture/detail.bmp";
 
     std::vector<Vertex> vertices; // 每个像素需要6个点，每个点需要5个float值
     std::vector<unsigned int> indices;
@@ -98,9 +134,9 @@ private:
                 float x = lengthInterval * i, z = widthInterval * j;
                 float u = x / (LENGTH), v = z / (WIDTH);
                 int heightmap_u = u * (heightmapHeight-1), heightmap_v = v * (heightmapWidth-1);
-                float y = heightmapData[heightmap_u * heightmapHeight + heightmap_v] / 256.0 * 1.0;
+                float y = heightmapData[heightmap_v * heightmapWidth + heightmap_u] / 256.0 * 1.0 - 0.3;
 
-                Vertex vertex{glm::vec3(x, z, y), glm::vec2(u, v)};
+                Vertex vertex{glm::vec3(x, y, z), glm::vec2(u, v)};
                 vertices.push_back(vertex);
             }
         }
