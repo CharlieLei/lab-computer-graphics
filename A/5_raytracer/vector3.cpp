@@ -47,7 +47,7 @@ Vector3& operator *= ( Vector3& A , const double& k ) {
 	return A;
 }
 
-Vector3& operator += ( Vector3& A , const double& k ) {
+Vector3& operator /= ( Vector3& A , const double& k ) {
 	A = A / k;
 	return A;
 }
