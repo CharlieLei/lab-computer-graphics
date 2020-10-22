@@ -27,7 +27,7 @@ class Material {
 public:
 	Color color , absor;
 	double refl , refr;
-	double diff , spec;
+	double diff , spec; // 漫反射系数 镜面反射系数
 	double rindex;
 	double drefl;
 	Bmp* texture;
@@ -76,8 +76,8 @@ struct CollidePrimitive {
 
 class Sphere : public Primitive {
 protected:
-	Vector3 O , De , Dc;
-	double R;
+	Vector3 O , De , Dc; // 球心坐标 用于将球面转成纹理坐标的两个坐标轴
+	double R;            // 半径
 
 public:
 	Sphere();
@@ -97,8 +97,8 @@ public:
 
 class Plane : public Primitive {
 protected:
-	Vector3 N , Dx , Dy;
-	double R;
+	Vector3 N , Dx , Dy; // 法向量 用于将平面转成纹理坐标的两个坐标轴
+	double R;            // 原点沿法向量方向到面的距离，R*N 是面上的一个点
 
 public:
 	Plane() : Primitive() {}

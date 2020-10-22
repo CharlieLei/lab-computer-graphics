@@ -95,37 +95,43 @@ void Sphere::Input( std::string var , std::stringstream& fin ) {
 }
 
 CollidePrimitive Sphere::Collide( Vector3 ray_O , Vector3 ray_V ) {
-	ray_V = ray_V.GetUnitVector();
-	Vector3 P = ray_O - O;
-	double b = -P.Dot( ray_V );
-	double det = b * b - P.Module2() + R * R;
+	ray_V = ray_V.GetUnitVector(); // 光线方向
+	Vector3 P = ray_O - O; // 球心到发射点的向量
+	double b = -P.Dot( ray_V ); // b = ||P||^2 * cos^2(theta)
+	double det = b * b - P.Module2() + R * R; // det = R^2 - ( ||P|| * sin(theta) )^2
 	CollidePrimitive ret;
 
 	if ( det > EPS ) {
+        // det > 0 说明射线与球有两个交点
 		det = sqrt( det );
+        // x1 < x2
 		double x1 = b - det  , x2 = b + det;
 
+        // x1 < x2 < 0 说明球在射线的反方向相交
 		if ( x2 < EPS ) return ret;
 		if ( x1 > EPS ) {
+            // 0 < x1 < x2 说明球与射线有两个交点，x1是第一个交点 且 交点是球面的正面
 			ret.dist = x1;
 			ret.front = true;
 		} else {
+            // x1 < 0 < x2 说明球与射线在正方向上只有一个交点 且 交点是球面的背面
 			ret.dist = x2;
 			ret.front = false;
 		} 
-	} else 
+	} else
+        // det <= 0 说明射线与球有两个交点
 		return ret;
 
-	ret.C = ray_O + ray_V * ret.dist;
-	ret.N = ( ret.C - O ).GetUnitVector();
-	if ( ret.front == false ) ret.N = -ret.N;
+	ret.C = ray_O + ray_V * ret.dist; // 交点
+	ret.N = ( ret.C - O ).GetUnitVector(); // 交点所在面为正面时的法向量
+	if ( ret.front == false ) ret.N = -ret.N; // 交点在背面，法向量取负
 	ret.isCollide = true;
 	ret.collide_primitive = this;
 	return ret;
 }
 
 Color Sphere::GetTexture(Vector3 crash_C) {
-	Vector3 I = ( crash_C - O ).GetUnitVector();
+	Vector3 I = ( crash_C - O ).GetUnitVector(); // 球心到交点的方向向量
 	double a = acos( -I.Dot( De ) );
 	double b = acos( std::min( std::max( I.Dot( Dc ) / sin( a ) , -1.0 ) , 1.0 ) );
 	double u = a / PI , v = b / 2 / PI;
@@ -143,17 +149,18 @@ void Plane::Input( std::string var , std::stringstream& fin ) {
 }
 
 CollidePrimitive Plane::Collide( Vector3 ray_O , Vector3 ray_V ) {
-	ray_V = ray_V.GetUnitVector();
-	N = N.GetUnitVector();
-	double d = N.Dot( ray_V );
+	ray_V = ray_V.GetUnitVector(); // 光线方向
+	N = N.GetUnitVector(); // 平面单位法向量
+	double d = N.Dot( ray_V ); // cos(theta)
 	CollidePrimitive ret;
+    // cos(theta) = 0 说明光线与平面平行，无交点
 	if ( fabs( d ) < EPS ) return ret;
-	double l = ( N * R - ray_O ).Dot( N ) / d;
-	if ( l < EPS ) return ret;
+	double l = ( N * R - ray_O ).Dot( N ) / d; // R * N 是平面上的一个点 (交点p - 平面上另一点p') . N = 0
+	if ( l < EPS ) return ret; // 若l < 0，则说明交点在射线反方向
 
 	ret.dist = l;
-	ret.front = ( d < 0 );
-	ret.C = ray_O + ray_V * ret.dist;
+	ret.front = ( d < 0 ); // cos(theta) < 0 => theta > 90°
+	ret.C = ray_O + ray_V * ret.dist; // 交点
 	ret.N = ( ret.front ) ? N : -N;
 	ret.isCollide = true;
 	ret.collide_primitive = this;
@@ -175,7 +182,7 @@ void Square::Input( std::string var , std::stringstream& fin ) {
 
 CollidePrimitive Square::Collide( Vector3 ray_O , Vector3 ray_V ) {
 	CollidePrimitive ret;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return ret;
 }
 
@@ -194,13 +201,13 @@ void Cylinder::Input( std::string var , std::stringstream& fin ) {
 
 CollidePrimitive Cylinder::Collide( Vector3 ray_O , Vector3 ray_V ) {
 	CollidePrimitive ret;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return ret;
 }
 
 Color Cylinder::GetTexture(Vector3 crash_C) {
 	double u = 0.5 ,v = 0.5;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return material->texture->GetSmoothColor( u , v );
 }
 
@@ -229,13 +236,13 @@ void Bezier::Input( std::string var , std::stringstream& fin ) {
 
 CollidePrimitive Bezier::Collide( Vector3 ray_O , Vector3 ray_V ) {
 	CollidePrimitive ret;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return ret;
 }
 
 Color Bezier::GetTexture(Vector3 crash_C) {
 	double u = 0.5 ,v = 0.5;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return material->texture->GetSmoothColor( u , v );
 }
 
