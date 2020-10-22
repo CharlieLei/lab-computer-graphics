@@ -43,7 +43,7 @@ void SquareLight::Input( std::string var , std::stringstream& fin ) {
 
 double SquareLight::CalnShade( Vector3 C , Primitive* primitive_head , int shade_quality ) {
 	int shade = 0;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return 0;
 }
 
@@ -65,7 +65,7 @@ void SphereLight::Input( std::string var , std::stringstream& fin ) {
 
 double SphereLight::CalnShade( Vector3 C , Primitive* primitive_head , int shade_quality ) {
 	int shade = 0;
-	//NEED TO IMPLEMENT
+	//TODO: NEED TO IMPLEMENT
 	return 0;
 }
 

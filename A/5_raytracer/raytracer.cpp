@@ -26,17 +26,22 @@ Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) 
 
 	for ( Light* light = light_head ; light != NULL ; light = light->GetNext() ) {
 		double shade = light->CalnShade( collide_primitive.C , scene.GetPrimitiveHead() , camera->GetShadeQuality() );
+        // shade == 0: 光线与物体的交点collide_primitive.C 在阴影中
+        // shade == 1: 光线与物体的交点collide_primitive.C 不在阴影中，能被光照射到
 		if ( shade < EPS ) continue;
 		
-		Vector3 R = ( light->GetO() - collide_primitive.C ).GetUnitVector();
-		double dot = R.Dot( collide_primitive.N );
+		Vector3 R = ( light->GetO() - collide_primitive.C ).GetUnitVector(); // 光源方向向量
+		double dot = R.Dot( collide_primitive.N ); // 光源方向向量与法向量的余弦值
 		if ( dot > EPS ) {
+            // 光源方向和法向量的夹角小于90°
 			if ( hash != NULL && light->IsPointLight() ) *hash = ( *hash + light->GetSample() ) & HASH_MOD;
 
+            // 物体漫反射率大于0
 			if ( primitive->GetMaterial()->diff > EPS ) {
 				double diff = primitive->GetMaterial()->diff * dot * shade;
 				ret += color * light->GetColor() * diff;
 			}
+            // 物体镜面反射率大于0
 			if ( primitive->GetMaterial()->spec > EPS ) {
 				double spec = primitive->GetMaterial()->spec * pow( dot , SPEC_POWER ) * shade;
 				ret += color * light->GetColor() * spec;
@@ -57,7 +62,7 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 	else
 	{
 		return RayTracing( collide_primitive.C , ray_V , dep + 1 , hash ) * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
-		//NEED TO IMPLEMENT
+		//TODO: NEED TO IMPLEMENT
 		//ADD BLUR
 	}
 }
@@ -77,6 +82,14 @@ Color Raytracer::CalnRefraction(CollidePrimitive collide_primitive , Vector3 ray
 	return rcol * trans * primitive->GetMaterial()->refr;
 }
 
+/**
+ * 
+ * @param ray_O 光线发射点坐标
+ * @param ray_V 光线发射方向向量
+ * @param dep 递归深度
+ * @param hash 
+ * @return 
+ */
 Color Raytracer::RayTracing( Vector3 ray_O , Vector3 ray_V , int dep , int* hash ) {
 	if ( dep > MAX_RAYTRACING_DEP ) return Color();
 
@@ -168,6 +181,7 @@ void Raytracer::CreateAll()
 		}
 	}
 
+    // 把所有光源链接到物体链表的前面
 	scene.CreateScene(CreateAndLinkLightPrimitive(primitive_head));
 	camera->Initialize();
 }
@@ -175,8 +189,8 @@ void Raytracer::CreateAll()
 void Raytracer::Run() {
 	CreateAll();
 
-	Vector3 ray_O = camera->GetO();
-	int H = camera->GetH() , W = camera->GetW();
+	Vector3 ray_O = camera->GetO(); // 摄像机坐标
+	int H = camera->GetH() , W = camera->GetW(); // 光栅的高度与宽度
 	int** sample = new int*[H];
 	for ( int i = 0 ; i < H ; i++ ) {
 		sample[i] = new int[W];
@@ -187,7 +201,7 @@ void Raytracer::Run() {
 	//for ( int i = 0 ; i < H ; std::cout << "Sampling:   " << ++i << "/" << H << std::endl )
 	for(int i=0;i<H;i++)
 		for ( int j = 0 ; j < W ; j++ ) {
-			Vector3 ray_V = camera->Emit( i , j );
+			Vector3 ray_V = camera->Emit( i , j ); // 从摄像机出发向像素(i, j)发射的光线的方向向量
 			Color color = RayTracing( ray_O , ray_V , 1 , &sample[i][j] );
 			camera->SetColor( i , j , color );
 		}
