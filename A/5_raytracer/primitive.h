@@ -25,11 +25,11 @@ public:
 
 class Material {
 public:
-	Color color , absor;
-	double refl , refr;
-	double diff , spec; // 漫反射系数 镜面反射系数
-	double rindex;
-	double drefl;
+	Color color , absor; // 材质颜色 光从内部折射到外部时会吸收的光
+	double refl , refr;  // 反射系数 折射系数（每一次迭代，返回的颜色乘一次这些系数）
+	double diff , spec;  // 漫反射系数 镜面反射系数（参考phong模型）
+	double rindex;       // 折射率
+	double drefl;        // 跟模糊有关？
 	Bmp* texture;
 	Blur* blur;
 

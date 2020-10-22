@@ -61,6 +61,10 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 		return RayTracing( collide_primitive.C , ray_V , dep + 1 , hash ) * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
 	else
 	{
+	    // add a little random vector when calculating the directions of the reflected rays
+	    ray_V.x += ran();
+	    ray_V.y += ran();
+	    ray_V.z += ran();
 		return RayTracing( collide_primitive.C , ray_V , dep + 1 , hash ) * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
 		//TODO: NEED TO IMPLEMENT
 		//ADD BLUR
