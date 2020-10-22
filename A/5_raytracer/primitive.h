@@ -27,7 +27,7 @@ class Material {
 public:
 	Color color , absor;
 	double refl , refr;
-	double diff , spec; // diffuse coefficient and specular coefficient
+	double diff , spec;
 	double rindex;
 	double drefl;
 	Bmp* texture;

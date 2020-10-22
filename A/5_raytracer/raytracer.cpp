@@ -26,22 +26,17 @@ Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) 
 
 	for ( Light* light = light_head ; light != NULL ; light = light->GetNext() ) {
 		double shade = light->CalnShade( collide_primitive.C , scene.GetPrimitiveHead() , camera->GetShadeQuality() );
-		// shade == 0: 光线与物体的交点collide_primitive.C 在阴影中
-		// shade == 1: 光线与物体的交点collide_primitive.C 不在阴影中，能被光照射到
 		if ( shade < EPS ) continue;
-
-		Vector3 R = ( light->GetO() - collide_primitive.C ).GetUnitVector(); // 光源方向向量
-		double dot = R.Dot( collide_primitive.N ); // 光源方向向量与法向量的余弦值
-		// 光源方向和法向量的夹角小于90°
+		
+		Vector3 R = ( light->GetO() - collide_primitive.C ).GetUnitVector();
+		double dot = R.Dot( collide_primitive.N );
 		if ( dot > EPS ) {
 			if ( hash != NULL && light->IsPointLight() ) *hash = ( *hash + light->GetSample() ) & HASH_MOD;
 
-			// 物体漫反射率大于0
 			if ( primitive->GetMaterial()->diff > EPS ) {
 				double diff = primitive->GetMaterial()->diff * dot * shade;
 				ret += color * light->GetColor() * diff;
 			}
-			// 物体镜面反射率大于0
 			if ( primitive->GetMaterial()->spec > EPS ) {
 				double spec = primitive->GetMaterial()->spec * pow( dot , SPEC_POWER ) * shade;
 				ret += color * light->GetColor() * spec;
@@ -82,14 +77,6 @@ Color Raytracer::CalnRefraction(CollidePrimitive collide_primitive , Vector3 ray
 	return rcol * trans * primitive->GetMaterial()->refr;
 }
 
-/**
- *
- * @param ray_O ray position
- * @param ray_V ray direction
- * @param dep recursion depth
- * @param hash address of sample[i][j]
- * @return
- */
 Color Raytracer::RayTracing( Vector3 ray_O , Vector3 ray_V , int dep , int* hash ) {
 	if ( dep > MAX_RAYTRACING_DEP ) return Color();
 
@@ -181,7 +168,6 @@ void Raytracer::CreateAll()
 		}
 	}
 
-	// 把所有光源链接到物体链表的前面
 	scene.CreateScene(CreateAndLinkLightPrimitive(primitive_head));
 	camera->Initialize();
 }
@@ -189,25 +175,23 @@ void Raytracer::CreateAll()
 void Raytracer::Run() {
 	CreateAll();
 
-	Vector3 ray_O = camera->GetO(); // position of the camera
-	int H = camera->GetH() , W = camera->GetW(); // height and width of raster
-	int** sample = new int*[H]; // raster
+	Vector3 ray_O = camera->GetO();
+	int H = camera->GetH() , W = camera->GetW();
+	int** sample = new int*[H];
 	for ( int i = 0 ; i < H ; i++ ) {
 		sample[i] = new int[W];
 		for ( int j = 0 ; j < W ; j++ )
 			sample[i][j] = 0;
 	}
 
-	// sampling
 	//for ( int i = 0 ; i < H ; std::cout << "Sampling:   " << ++i << "/" << H << std::endl )
 	for(int i=0;i<H;i++)
 		for ( int j = 0 ; j < W ; j++ ) {
-			Vector3 ray_V = camera->Emit( i , j ); // the light from camera position to the pixel(i, j)
-			Color color = RayTracing( ray_O , ray_V , 1 , &sample[i][j] ); // color of pixel(i, j)
+			Vector3 ray_V = camera->Emit( i , j );
+			Color color = RayTracing( ray_O , ray_V , 1 , &sample[i][j] );
 			camera->SetColor( i , j , color );
 		}
 
-	// resampling
 	//for ( int i = 0 ; i < H ; std::cout << "Resampling: " << ++i << "/" << H << std::endl )
 	for(int i=0;i<H;i++)
 		for ( int j = 0 ; j < W ; j++ ) {
