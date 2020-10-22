@@ -20,4 +20,8 @@ add_executable(5_raytracer
         scene.cpp
         scene.h
         vector3.cpp
-        vector3.h)
+        vector3.h
+        blackwhite.bmp
+        floor.bmp
+        marble.bmp
+        scene.txt)

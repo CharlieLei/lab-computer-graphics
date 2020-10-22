@@ -40,9 +40,9 @@ Camera::~Camera() {
 }
 
 void Camera::Initialize() {
-	N = N.GetUnitVector();
-	Dx = N.GetAnVerticalVector();
-	Dy = Dx * N;
+	N = N.GetUnitVector(); // 相机所看的方向
+	Dx = N.GetAnVerticalVector(); // 世界坐标的上向量是(0,0,1)
+	Dy = Dx * N;  // Dx和N的叉乘
 	Dx = Dx * lens_W / 2;
 	Dy = Dy * lens_H / 2;
 
