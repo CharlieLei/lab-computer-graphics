@@ -201,6 +201,41 @@ void Cylinder::Input( std::string var , std::stringstream& fin ) {
 
 CollidePrimitive Cylinder::Collide( Vector3 ray_O , Vector3 ray_V ) {
     //TODO: NEED TO IMPLEMENT
+    Vector3 N1 = (O1 - O2).GetUnitVector(); // 圆柱底面单位法向量，方向朝底面外部
+    Vector3 N2 = (O2 - O1).GetUnitVector(); // 圆柱顶面单位法向量，方向朝顶面外部
+
+    CollidePrimitive down_base = CollideAtBase(ray_O, ray_V, O1, N1);
+    CollidePrimitive up_base = CollideAtBase(ray_O, ray_V, O2, N2);
+    CollidePrimitive side = CollideAtSide(ray_O, ray_V);
+
+    CollidePrimitive ret;
+    if (down_base.isCollide || up_base.isCollide || side.isCollide) {
+        double down_dist = down_base.isCollide? down_base.dist : BIG_DIST;
+        double up_dist = up_base.isCollide? up_base.dist : BIG_DIST;
+        double side_dist = side.isCollide? side.dist : BIG_DIST;
+
+        double min_dist = std::min( side_dist, std::min(down_dist, up_dist) );
+
+        if (down_dist - min_dist < EPS) {
+            return down_base;
+        } else if (up_dist - min_dist < EPS) {
+            return up_base;
+        } else {
+            return side;
+        }
+
+    } else {
+        return ret;
+    }
+}
+
+Color Cylinder::GetTexture(Vector3 crash_C) {
+	double u = 0.5 ,v = 0.5;
+	//TODO: NEED TO IMPLEMENT
+	return material->texture->GetSmoothColor( u , v );
+}
+
+CollidePrimitive Cylinder::CollideAtSide(Vector3 ray_O, Vector3 ray_V) {
     ray_V = ray_V.GetUnitVector(); // 光线方向
     Vector3 N1 = (O1 - O2).GetUnitVector(); // 圆柱底面单位法向量，方向朝底面外部
     Vector3 N2 = (O2 - O1).GetUnitVector(); // 圆柱顶面单位法向量，方向朝顶面外部
@@ -285,36 +320,32 @@ CollidePrimitive Cylinder::Collide( Vector3 ray_O , Vector3 ray_V ) {
     ret.isCollide = true;
     ret.collide_primitive = this;
     return ret;
-
-
-//    ray_V = ray_V.GetUnitVector(); // 光线方向
-//    Vector3 N1 = (O1 - O2).GetUnitVector(); // 圆柱底面单位法向量，方向朝底面外部
-//    double d1 = N1.Dot( ray_V ); // cos(theta1)
-//    CollidePrimitive ret;
-//    // cos(theta1) = 0 说明光线与圆柱底面平行，无交点
-//    if ( fabs( d1 ) < EPS ) return ret;
-//    double t1 = ( ray_O - O1 ).Dot( N1 ) / d1; // 交点p1 = ray_O + t1 * ray_V
-//    // 若l < 0，则说明交点在射线反方向
-//    if ( t1 < EPS ) return ret;
-//
-//    Vector3 collidePoint1 = ray_O + t1 * ray_V; // 交点p1
-//    double sqDist1 = collidePoint1.Distance2(O1); // 交点和底面圆心距离的平方
-//    // 交点在底面圆的外面
-//    if (sqDist1 - R*R > EPS) return ret;
-//
-//    ret.dist = t1;
-//    ret.front = ( d1 > 0 ); // cos(theta) < 0 => theta > 90°
-//    ret.C = ray_O + ray_V * ret.dist; // 交点
-//    ret.N = ( ret.front ) ? N1 : -N1;
-//    ret.isCollide = true;
-//    ret.collide_primitive = this;
-//    return ret;
 }
 
-Color Cylinder::GetTexture(Vector3 crash_C) {
-	double u = 0.5 ,v = 0.5;
-	//TODO: NEED TO IMPLEMENT
-	return material->texture->GetSmoothColor( u , v );
+CollidePrimitive Cylinder::CollideAtBase(Vector3 ray_O, Vector3 ray_V, Vector3 O, Vector3 N) {
+    ray_V = ray_V.GetUnitVector(); // 光线方向
+    N = N.GetUnitVector(); // 平面单位法向量
+    // cos(theta1) = 0 说明光线与圆柱底面平行，无交点
+    double d = N.Dot( ray_V );
+    CollidePrimitive ret;
+    // cos(theta) = 0 说明光线与平面平行，无交点
+    if ( fabs( d ) < EPS ) return ret;
+    double t = ( O - ray_O ).Dot( N ) / d; // 交点p = ray_O + t * ray_V
+    // 若t < 0，则说明交点在射线反方向
+    if ( t < EPS ) return ret;
+
+    Vector3 collidePoint = ray_O + t * ray_V; // 交点p
+    double sqDist1 = collidePoint.Distance2(O); // 交点和底面圆心距离的平方
+    // 交点在底面圆的外面
+    if (sqDist1 - R*R > EPS) return ret;
+
+    ret.dist = t;
+    ret.front = ( d < 0 ); // cos(theta) < 0 => theta > 90°
+    ret.C = collidePoint; // 交点
+    ret.N = ( ret.front ) ? N : -N;
+    ret.isCollide = true;
+    ret.collide_primitive = this;
+    return ret;
 }
 
 void Bezier::Input( std::string var , std::stringstream& fin ) {

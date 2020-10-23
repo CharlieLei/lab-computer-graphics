@@ -141,6 +141,23 @@ public:
 	void Input( std::string , std::stringstream& );
 	CollidePrimitive Collide( Vector3 ray_O , Vector3 ray_V );
 	Color GetTexture(Vector3 crash_C);
+
+private:
+    /**
+     * 判断射线和圆柱侧面的交点
+     * @param ray_O 射线源点
+     * @param ray_V 射线方向
+     * @return
+     */
+    CollidePrimitive CollideAtSide( Vector3 ray_O , Vector3 ray_V );
+    /**
+     * 判断射线和圆柱上下底面的交点
+     * @param ray_O 射线源点
+     * @param ray_V 射线方向
+     * @param O 底面圆心
+     * @return
+     */
+    CollidePrimitive CollideAtBase( Vector3 ray_O , Vector3 ray_V, Vector3 O, Vector3 N);
 };
 
 class Bezier : public Primitive {
