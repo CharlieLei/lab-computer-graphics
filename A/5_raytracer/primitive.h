@@ -76,7 +76,7 @@ struct CollidePrimitive {
 
 class Sphere : public Primitive {
 protected:
-	Vector3 O , De , Dc; // 球心坐标 用于将球面转成纹理坐标的两个坐标轴
+	Vector3 O , De , Dc; // 球心坐标 用于将球面转成纹理坐标的两个坐标轴（纵轴和横轴）
 	double R;            // 半径
 
 public:
@@ -97,7 +97,7 @@ public:
 
 class Plane : public Primitive {
 protected:
-	Vector3 N , Dx , Dy; // 法向量 用于将平面转成纹理坐标的两个坐标轴
+	Vector3 N , Dx , Dy; // 法向量 用于将平面转成纹理坐标的两个坐标轴（平面的横轴和纵轴）
 	double R;            // 原点沿法向量方向到面的距离，R*N 是面上的一个点
 
 public:
@@ -130,8 +130,8 @@ public:
 };
 
 class Cylinder : public Primitive {
-	Vector3 O1, O2;
-	double R;
+	Vector3 O1, O2; // 底面圆心 顶面圆心
+	double R; // 半径
 
 public:
 	Cylinder() : Primitive() {}

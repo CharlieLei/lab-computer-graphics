@@ -200,9 +200,115 @@ void Cylinder::Input( std::string var , std::stringstream& fin ) {
 }
 
 CollidePrimitive Cylinder::Collide( Vector3 ray_O , Vector3 ray_V ) {
-	CollidePrimitive ret;
-	//TODO: NEED TO IMPLEMENT
-	return ret;
+    //TODO: NEED TO IMPLEMENT
+    ray_V = ray_V.GetUnitVector(); // 光线方向
+    Vector3 N1 = (O1 - O2).GetUnitVector(); // 圆柱底面单位法向量，方向朝底面外部
+    Vector3 N2 = (O2 - O1).GetUnitVector(); // 圆柱顶面单位法向量，方向朝顶面外部
+
+    // [ O_1P x (-N1) ]^2 = R^2
+    Vector3 f1 = (ray_O - O1) * (-N1);
+    Vector3 g1 = ray_V * (-N1);
+    double a = g1.Dot(g1);
+    double b = 2 * f1.Dot(g1);
+    double c = f1.Dot(f1) - R * R;
+    double det = b * b - 4 * a * c; // 二次方程根中的delta
+
+    CollidePrimitive ret;
+    double side_dist = 0.0;
+    bool side_front = false;
+    if ( det > EPS ) {
+        // det > 0 说明射线与圆柱侧面有两个交点
+        det = sqrt( det );
+        // t_side1 < t_side2
+        double t_side1 = (-b - det) / (2 * a)  , t_side2 = (-b + det) / (2 * a);
+
+        if ( t_side2 < EPS ) {
+            // t_side1 < t_side2 < 0 说明圆柱侧面在射线的反方向相交
+            return ret;
+        } else {
+            // 圆柱侧面在射线的正方向上至少有一个交点
+            if ( t_side1 > EPS ) {
+                // 0 < t_side1 < t_side2 说明圆柱侧面与射线有两个交点，x1是第一个交点 且 交点是圆柱侧面的正面
+
+                // 判断两个交点是否都在圆柱的高度范围内
+
+                // 靠近射线源点的交点1
+                // ----------------
+                Vector3 sideCollidePoint1 = ray_O + ray_V * t_side1;
+                Vector3 O1P1 = sideCollidePoint1 - O1; // 底面圆心到交点1的向量
+                Vector3 O2P1 = sideCollidePoint1 - O2; // 顶面圆心到交点1的向量
+                double thetaO1P1 = O1P1.Dot(N1), thetaO2P1 = O2P1.Dot(N2); // N1和N2都朝向圆柱的外部
+
+                // 远离射线源点的交点2
+                // ---------------
+                Vector3 sideCollidePoint2 = ray_O + ray_V * t_side2;
+                Vector3 O1P2 = sideCollidePoint2 - O1; // 底面圆心到交点2的向量
+                Vector3 O2P2 = sideCollidePoint2 - O2; // 顶面圆心到交点2的向量
+                double thetaO1P2 = O1P2.Dot(N1), thetaO2P2 = O2P2.Dot(N2); // N1和N2都朝向圆柱的外部
+
+                if (thetaO1P1 < EPS && thetaO2P1 < EPS) {
+                    // 交点1 在圆柱的高度范围内
+                    side_dist = t_side1;
+                    side_front = true;
+                } else if ( thetaO1P2 < EPS && thetaO2P2 < EPS ) {
+                    // 交点2 在圆柱的高度范围内
+                    side_dist = t_side2;
+                    side_front = false;
+                } else {
+                    // 两个交点都不在圆柱的高度范围内
+                    return ret;
+                }
+            } else {
+                // t_side1 < 0 < t_side2 说明圆柱侧面与射线在正方向上只有一个交点 且 交点是圆柱侧面的背面
+                side_dist = t_side2;
+                side_front = false;
+                // 判断交点是否在圆柱的高度范围内
+                Vector3 sideCollidePoint = ray_O + ray_V * side_dist; // 交点
+                Vector3 O1P = sideCollidePoint - O1; // 底面圆心到交点的向量
+                Vector3 O2P = sideCollidePoint - O2; // 顶面圆心到交点的向量
+                double theta1 = O1P.Dot(N1), theta2 = O2P.Dot(N2); // N1和N2都朝向圆柱的外部
+                if (theta1 > EPS || theta2 > EPS) {
+                    return ret;
+                }
+            }
+        }
+    } else {
+        // det <= 0 说明射线与圆柱侧面没有交点
+        return ret;
+    }
+
+    ret.dist = side_dist;
+    ret.front = side_front;
+    ret.C = ray_O + ray_V * ret.dist; // 交点
+    ret.N = ( (ret.C - O1) - (ret.C - O1).Dot(-N1) * (-N1) ).GetUnitVector(); // 交点所在面为正面时的法向量
+    if ( ret.front == false ) ret.N = -ret.N; // 交点在背面，法向量取负
+    ret.isCollide = true;
+    ret.collide_primitive = this;
+    return ret;
+
+
+//    ray_V = ray_V.GetUnitVector(); // 光线方向
+//    Vector3 N1 = (O1 - O2).GetUnitVector(); // 圆柱底面单位法向量，方向朝底面外部
+//    double d1 = N1.Dot( ray_V ); // cos(theta1)
+//    CollidePrimitive ret;
+//    // cos(theta1) = 0 说明光线与圆柱底面平行，无交点
+//    if ( fabs( d1 ) < EPS ) return ret;
+//    double t1 = ( ray_O - O1 ).Dot( N1 ) / d1; // 交点p1 = ray_O + t1 * ray_V
+//    // 若l < 0，则说明交点在射线反方向
+//    if ( t1 < EPS ) return ret;
+//
+//    Vector3 collidePoint1 = ray_O + t1 * ray_V; // 交点p1
+//    double sqDist1 = collidePoint1.Distance2(O1); // 交点和底面圆心距离的平方
+//    // 交点在底面圆的外面
+//    if (sqDist1 - R*R > EPS) return ret;
+//
+//    ret.dist = t1;
+//    ret.front = ( d1 > 0 ); // cos(theta) < 0 => theta > 90°
+//    ret.C = ray_O + ray_V * ret.dist; // 交点
+//    ret.N = ( ret.front ) ? N1 : -N1;
+//    ret.isCollide = true;
+//    ret.collide_primitive = this;
+//    return ret;
 }
 
 Color Cylinder::GetTexture(Vector3 crash_C) {
