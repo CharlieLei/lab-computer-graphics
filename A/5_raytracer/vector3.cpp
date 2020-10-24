@@ -107,7 +107,7 @@ void Vector3::AssRandomVector() {
 Vector3 Vector3::GetAnVerticalVector() {
 	Vector3 ret = *this * Vector3( 0 , 0 , 1 );
 	if ( ret.IsZeroVector() ) ret = Vector3( 1 , 0 , 0 );
-		else ret = ret.GetUnitVector();
+	else ret = ret.GetUnitVector();
 	return ret;
 }
 

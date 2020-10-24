@@ -231,6 +231,38 @@ CollidePrimitive Cylinder::Collide( Vector3 ray_O , Vector3 ray_V ) {
 
 Color Cylinder::GetTexture(Vector3 crash_C) {
 	double u = 0.5 ,v = 0.5;
+	Vector3 De = (O2 - O1).GetUnitVector(); // 圆柱向上的方向
+    Vector3 Dc = De.GetAnVerticalVector(); // 圆柱某一个横向方向
+
+    double sqDist1 = crash_C.Distance2(O1); // 交点与底面圆心距离的平方
+    double sqDist2 = crash_C.Distance2(O2); // 交点与顶面圆心距离的平方
+
+    if (sqDist1 - R*R > EPS && sqDist2 - R*R > EPS) {
+        // 交点在圆柱侧面
+        double HEIGHT = O1.Distance(O2); // 圆柱高度
+
+        Vector3 O1C = crash_C - O1; // 底面圆心到交点的向量
+        double height = De.Dot( O1C ); // 交点到底面的垂直距离
+
+        Vector3 projectPoint = crash_C - height * De;
+        Vector3 O1P = (projectPoint - O1).GetUnitVector();
+        double theta = acos( std::min( std::max( O1P.Dot(Dc) , -1.0 ) , 1.0 ) );
+
+        u = theta / 2 / PI, v = height / HEIGHT;
+    } else if (sqDist1 - R*R > EPS) {
+        // 交点在圆柱顶面
+        Vector3 O2C = (crash_C - O2).GetUnitVector();
+        double theta = acos( std::min( std::max( O2C.Dot(Dc) , -1.0 ) , 1.0 ) );
+        double radius = crash_C.Distance(O2);
+        u = theta / 2 / PI, v = radius / R;
+    } else {
+        // 交点在圆柱底面
+        Vector3 O1C = (crash_C - O1).GetUnitVector();
+        double theta = acos( std::min( std::max( O1C.Dot(Dc) , -1.0 ) , 1.0 ) );
+        double radius = crash_C.Distance(O1);
+        u = theta / 2 / PI, v = radius / R;
+    }
+
 	//TODO: NEED TO IMPLEMENT
 	return material->texture->GetSmoothColor( u , v );
 }
