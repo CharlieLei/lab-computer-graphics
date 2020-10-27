@@ -18,9 +18,18 @@ light point
 	color= 2 2 2
 end
 
+primitive square
+	O= 2.5 1.5 0
+	Dx= 1 0 0
+	Dy= 0 0 1
+	color= 1 1 1
+	diff= 1
+	texture= blackwhite.bmp
+end
+
 primitive cylinder
-	O1= 2.5 0 1
-	O2= 2.5 1 1
+	O1= 2.5 0 0
+	O2= 2.5 1 0
 	R= 0.5
 	color= 1 1 1
 	diff= 1

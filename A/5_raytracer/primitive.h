@@ -111,7 +111,7 @@ public:
 
 class Square : public Primitive {
 protected:
-	Vector3 O , Dx , Dy; // 正面左下角顶点 横轴，其长度为矩形长度 纵轴，其长度为矩形宽度
+	Vector3 O , Dx , Dy; // 中心点 横轴，其长度为矩形长度的一半 纵轴，其长度为矩形宽度的一半
 
 public:
 	Square() : Primitive() {}

@@ -181,9 +181,32 @@ void Square::Input( std::string var , std::stringstream& fin ) {
 }
 
 CollidePrimitive Square::Collide( Vector3 ray_O , Vector3 ray_V ) {
+    //TODO: NEED TO IMPLEMENT
+    ray_V = ray_V.GetUnitVector(); // 光线方向
+    Vector3 xDir = Dx.GetUnitVector(), yDir = Dy.GetUnitVector(); // 横纵坐标轴
+    double length = Dx.Module(), width = Dy.Module();
 
-	CollidePrimitive ret;
-	//TODO: NEED TO IMPLEMENT
+    Vector3 N = (xDir * yDir).GetUnitVector(); // 平面单位法向量
+    double d = N.Dot( ray_V );
+    CollidePrimitive ret;
+    // cos(theta) = 0 说明光线与平面平行，无交点
+    if ( fabs( d ) < EPS ) return ret;
+    double t = ( O - ray_O ).Dot( N ) / d; // 交点p = ray_O + t * ray_V
+    // 若t < 0，则说明交点在射线反方向
+    if ( t < EPS ) return ret;
+
+    Vector3 collidePoint = ray_O + t * ray_V; // 交点p
+    Vector3 OP = collidePoint - O;
+    double x = OP.Dot(xDir), y = OP.Dot(yDir);
+
+    if (x + length < EPS || x - length > EPS || y + width < EPS || y - width > EPS) return ret; // 交点在矩形外部
+
+    ret.dist = t;
+    ret.front = ( d < 0 ); // cos(theta) < 0 => theta > 90°
+    ret.C = collidePoint; // 交点
+    ret.N = ( ret.front ) ? N : -N;
+    ret.isCollide = true;
+    ret.collide_primitive = this;
 	return ret;
 }
 
