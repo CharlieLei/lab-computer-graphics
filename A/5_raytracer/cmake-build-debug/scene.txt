@@ -13,23 +13,16 @@ camera
 	lens_W= 1.0
 end
 
-light point
-	O= 4 3 0
-	color= 2 2 2
-end
-
-primitive square
-	O= 2.5 1.5 0
-	Dx= 1 0 0
-	Dy= 0 0 1
+light square
+	O= 4 2 0
+	Dx= 0 0 0.5
+	Dy= 0 0.5 -0.5
 	color= 1 1 1
-	diff= 1
-	texture= blackwhite.bmp
 end
 
 primitive cylinder
 	O1= 2.5 0 0
-	O2= 2.5 1 0
+	O2= 2.5 0.5 0
 	R= 0.5
 	color= 1 1 1
 	diff= 1
@@ -46,5 +39,4 @@ primitive plane
 	texture= floor.bmp
 	Dx= 8 0 0
 	Dy= 0 0 8
-	blur= exp
 end

@@ -42,9 +42,30 @@ void SquareLight::Input( std::string var , std::stringstream& fin ) {
 
 
 double SquareLight::CalnShade( Vector3 C , Primitive* primitive_head , int shade_quality ) {
-	int shade = 0;
-	//TODO: NEED TO IMPLEMENT
-	return 0;
+//	//TODO: NEED TO IMPLEMENT
+//
+	// 在矩形面上采样若干个点，判断点到交点之间是否存在物体
+    Vector3 xDir = Dx.GetUnitVector(), yDir = Dy.GetUnitVector(); // 横纵坐标轴
+    double length = Dx.Module(), width = Dy.Module();
+
+    int shadeCount = 0; // 被遮挡的采样点个数
+    int sampleCount = 100;
+	for (int i = 0; i < sampleCount; i++) {
+	    double x = length * ( 2.0 * ran() - 1.0), y = width * (2.0 * ran() - 1.0);
+	    Vector3 lightPoint = O + x * xDir + y * yDir;
+        Vector3 V = lightPoint - C;
+        double dist = V.Module();
+        for ( Primitive* now = primitive_head ; now != NULL ; now = now->GetNext() )
+        {
+            CollidePrimitive tmp = now->Collide(C, V);
+            if ( EPS < (dist - tmp.dist) )  {
+                shadeCount++;
+                break;
+            }
+        }
+	}
+    double shade = 1.0 - (double) shadeCount / (double) sampleCount;
+	return shade;
 }
 
 Primitive* SquareLight::CreateLightPrimitive()
