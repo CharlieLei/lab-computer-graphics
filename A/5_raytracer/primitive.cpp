@@ -181,6 +181,7 @@ void Square::Input( std::string var , std::stringstream& fin ) {
 }
 
 CollidePrimitive Square::Collide( Vector3 ray_O , Vector3 ray_V ) {
+
 	CollidePrimitive ret;
 	//TODO: NEED TO IMPLEMENT
 	return ret;
