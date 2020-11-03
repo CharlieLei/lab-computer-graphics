@@ -61,13 +61,23 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 		return RayTracing( collide_primitive.C , ray_V , dep + 1 , hash ) * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
 	else
 	{
-	    // add a little random vector when calculating the directions of the reflected rays
-	    ray_V.x += ran();
-	    ray_V.y += ran();
-	    ray_V.z += ran();
+        //TODO: NEED TO IMPLEMENT
+        //ADD BLUR
+	    // 在交点的切平面上随机找x，y作为反射方向
+	    Vector3 N = collide_primitive.N;
+	    Vector3 xDir = N.GetAnVerticalVector();
+	    Vector3 yDir = (xDir * N).GetUnitVector();
+	    double x, y, z = ray_V.Dot(N);
+	    if (primitive->GetMaterial()->blur != nullptr) {
+            std::pair<double, double> coords = primitive->GetMaterial()->blur->GetXY();
+            x = coords.first;
+            y = coords.second;
+	    } else {
+	        x = cos(ran());
+	        y = sin(ran());
+	    }
+        ray_V = x * xDir + y * yDir + z * N;
 		return RayTracing( collide_primitive.C , ray_V , dep + 1 , hash ) * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
-		//TODO: NEED TO IMPLEMENT
-		//ADD BLUR
 	}
 }
 
