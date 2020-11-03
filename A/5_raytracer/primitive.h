@@ -9,6 +9,8 @@
 #include<string>
 #include<vector>
 
+#include "Eigen/Dense"
+
 extern const double EPS;
 extern const double PI;
 const double BIG_DIST = 1e100;
@@ -52,7 +54,7 @@ public:
 	Primitive();
 	Primitive( const Primitive& );
 	~Primitive();
-	
+
 	int GetSample() { return sample; }
 	Material* GetMaterial() { return material; }
 	Primitive* GetNext() { return next; }
@@ -141,8 +143,6 @@ public:
 	void Input( std::string , std::stringstream& );
 	CollidePrimitive Collide( Vector3 ray_O , Vector3 ray_V );
 	Color GetTexture(Vector3 crash_C);
-
-private:
     /**
      * 判断射线和圆柱侧面的交点
      * @param ray_O 射线源点
@@ -157,7 +157,7 @@ private:
      * @param O 底面圆心
      * @return
      */
-    CollidePrimitive CollideAtBase( Vector3 ray_O , Vector3 ray_V, Vector3 O, Vector3 N);
+    CollidePrimitive CollideAtBase( Vector3 ray_O , Vector3 ray_V, Vector3 O );
 };
 
 class Bezier : public Primitive {
@@ -165,7 +165,7 @@ class Bezier : public Primitive {
 	Vector3 N, Nx, Ny;
 	std::vector<double> R;
 	std::vector<double> Z;
-	int degree;
+	int degree; // 控制点个数
 	Cylinder* boundingCylinder;
 
 public:
@@ -175,6 +175,66 @@ public:
 	void Input( std::string , std::stringstream& );
 	CollidePrimitive Collide( Vector3 ray_O , Vector3 ray_V );
 	Color GetTexture(Vector3 crash_C);
+
+private:
+    CollidePrimitive CollideAtBezierCurve( Vector3 ray_O , Vector3 ray_V , double t, double u, double theta );
+    /**
+     * 计算贝塞尔曲线系数 Bernstein polynomial B_i,n(u) = C_n,i * u^i * (1-u)^(n-i)
+     * @param u
+     * @param n
+     * @param i
+     * @return
+     */
+    double B(double u, int n, int i);
+    /**
+     * 计算贝塞尔曲线上某一点的某个分量
+     * @param u
+     * @param ctrlPointsComponents 控制点在这个分量上的值
+     * @return
+     */
+    double P(double u, std::vector<double> ctrlPointsComponents);
+    /**
+     * 计算贝塞尔曲线上某一点在某个分量上的关于u的微分
+     * @param u
+     * @param ctrlPointsComponents 控制点在这个分量上的值
+     * @return
+     */
+    double dP(double u, std::vector<double> ctrlPointsComponents);
+    /**
+     * 光线 C = O + t * V
+     * @param t 距离
+     * @param ray_O 源点
+     * @param ray_V 光线方向
+     * @return
+     */
+    Vector3 C(double t, Vector3 ray_O , Vector3 ray_V);
+    /**
+     * 贝塞尔曲线上的某一点
+     * @param u 该点在 包围圆柱高度方向 上的投影距离
+     * @param theta 该点在 包围圆柱底面 上的投影的极坐标角度
+     * @return
+     */
+    Vector3 S(double u, double theta);
+    /**
+     * 要求解的方程 F = S - C = 0
+     * 相当于 光线上的点C 到 贝塞尔曲线上的点S 的 向量CS
+     * @param t 光线距离
+     * @param u 贝塞尔曲线点在 包围圆柱高度方向 上的投影距离
+     * @param theta 贝塞尔曲线点在 包围圆柱底面 上的投影的极坐标角度
+     * @param ray_O 光线源点
+     * @param ray_V 光线方向
+     * @return
+     */
+    Vector3 F(double t, double u, double theta, Vector3 ray_O , Vector3 ray_V);
+    /**
+     * 要方程 F 在 u 上的微分
+     * @param t 光线距离
+     * @param u 贝塞尔曲线点在 包围圆柱高度方向 上的投影距离
+     * @param theta 贝塞尔曲线点在 包围圆柱底面 上的投影的极坐标角度
+     * @param ray_V 光线方向
+     * @return
+     */
+    Eigen::Matrix3d dF(double t, double u, double theta, Vector3 ray_V);
 };
 
 #endif
