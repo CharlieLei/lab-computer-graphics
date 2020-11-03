@@ -17,7 +17,7 @@ Raytracer::Raytracer() {
 }
 
 Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) {
-	
+    if (!collide_primitive.isAccurate) collide_primitive.C += collide_primitive.N * 0.01;
 	Primitive* primitive = collide_primitive.collide_primitive;
 	Color color = primitive->GetMaterial()->color;
 	if ( primitive->GetMaterial()->texture != NULL ) color = color * collide_primitive.GetTexture();
@@ -53,7 +53,7 @@ Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) 
 }
 
 Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray_V , int dep , int* hash ) {
-	
+    if (!collide_primitive.isAccurate) collide_primitive.C += collide_primitive.N * 0.01;
 	ray_V = ray_V.Reflect( collide_primitive.N );
 	Primitive* primitive = collide_primitive.collide_primitive;
 
@@ -82,7 +82,7 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 }
 
 Color Raytracer::CalnRefraction(CollidePrimitive collide_primitive , Vector3 ray_V , int dep , int* hash ) {
-	
+    if (!collide_primitive.isAccurate) collide_primitive.C -= collide_primitive.N * 0.01;
 	Primitive* primitive = collide_primitive.collide_primitive;
 	double n = primitive->GetMaterial()->rindex;
 	if ( collide_primitive.front ) n = 1 / n;

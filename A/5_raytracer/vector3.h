@@ -2,6 +2,7 @@
 #define VECTOR3_H
 
 #include<sstream>
+#include "Eigen/Dense"
 
 extern const double EPS;
 extern const double PI;
@@ -42,6 +43,7 @@ public:
 	Vector3 Refract( Vector3 N , double n );
 	Vector3 Diffuse();
 	Vector3 Rotate( Vector3 axis , double theta );
+    Eigen::Vector3d ToEigenLibForm();
 };
 
 #endif

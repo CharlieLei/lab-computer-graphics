@@ -152,3 +152,7 @@ Vector3 Vector3::Rotate( Vector3 axis , double theta ) {
 	ret.z += z * ( axis.z * axis.z + ( 1 - axis.z * axis.z ) * cost );
 	return ret;
 }
+
+Eigen::Vector3d Vector3::ToEigenLibForm() {
+    return Eigen::Vector3d(x, y, z);
+}

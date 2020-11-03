@@ -3,6 +3,8 @@ project(5_raytracer)
 
 set(CMAKE_CXX_STANDARD 14)
 
+include_directories(Eigen)
+
 add_executable(5_raytracer
         main.cpp
         bmp.cpp

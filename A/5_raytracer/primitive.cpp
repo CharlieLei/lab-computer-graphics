@@ -424,116 +424,94 @@ void Bezier::Input(std::string var, std::stringstream &fin) {
     Primitive::Input(var, fin);
 }
 
-CollidePrimitive Bezier::Collide(Vector3 ray_O, Vector3 ray_V) {
-    //TODO: NEED TO IMPLEMENT
-    ray_V = ray_V.GetUnitVector(); // 光线方向
+CollidePrimitive Bezier::Collide( Vector3 ray_O , Vector3 ray_V ) {
+    ray_V = ray_V.GetUnitVector();
     CollidePrimitive ret;
 
-    // 先判断光线是否交于包围圆柱
     CollidePrimitive boundCollisions[3] = {
-            boundingCylinder->CollideAtBase(ray_O, ray_V, O1), // 底面
-            boundingCylinder->CollideAtBase(ray_O, ray_V, O2), // 顶面
-            boundingCylinder->CollideAtSide(ray_O, ray_V)         // 侧面
+            boundingCylinder->CollideAtSide(ray_O,ray_V),
+            boundingCylinder->CollideAtBase(ray_O,ray_V,O1),
+            boundingCylinder->CollideAtBase(ray_O,ray_V,O2)//,
+            //boundingCylinderInner->SideCollide(ray_O,ray_V),
+            //boundingCylinderInner->BaseCollide(ray_O,ray_V,true),
+            //boundingCylinderInner->BaseCollide(ray_O,ray_V,false)
     };
 
-    // 包围圆柱的碰撞个数
-    int collisionCount = 0;
-    for (auto &boundCollision : boundCollisions) {
-        if (boundCollision.isCollide) {
-            collisionCount++;
+    int collisionCnt = 0;
+    for (int i = 0; i < 3; i++) {
+        if (boundCollisions[i].isCollide) {
+            collisionCnt += 1;
         }
     }
-    if (collisionCount < 1) {
-        return ret;
-    }
+    if (collisionCnt < 1) return ret;
 
     for (int i = 0; i < 3; i++) {
-        if (!boundCollisions[i].isCollide) continue;
+        if (boundCollisions[i].isCollide) {
+            //Base collides
+            if ( (i == 1) && ((boundCollisions[i].C - O1).Module() < R[0] + EPS) ) {
+//                ret.u = 0;
+//                ret.v = 0;
+                ret.dist = boundCollisions[i].dist;
+                ret.C = boundCollisions[i].C;
+                ret.N = boundCollisions[i].N;
+                ret.front = boundCollisions[i].front;
 
-        // 光线交于底面圆
-        if (i == 0 && (boundCollisions[i].C - O1).Module() < R[0] + EPS) {
-            ret.dist = boundCollisions[i].dist;
-            ret.front = boundCollisions[i].front;
-            ret.C = boundCollisions[i].C; // 交点
-            ret.N = boundCollisions[i].N;
-            ret.isCollide = true;
-            ret.collide_primitive = this;
-        }
+//                ret.isAccurate = true;
+                ret.isCollide = true;
+                ret.collide_primitive = this;
 
-        // 光线交于顶面圆
-        if (i == 1 && (boundCollisions[i].C - O2).Module() < R[R.size() - 1] + EPS) {
-            ret.dist = boundCollisions[i].dist;
-            ret.front = boundCollisions[i].front;
-            ret.C = boundCollisions[i].C; // 交点
-            ret.N = boundCollisions[i].N;
-            ret.isCollide = true;
-            ret.collide_primitive = this;
-        }
-
-        // 光线交于侧面
-        Vector3 O1C = boundCollisions[i].C - O1;
-        double t0 = boundCollisions[i].dist;
-        double u0 = O1C.Dot(N) / (O2 - O1).Module(); // 高度百分比
-        double theta0 = atan2(O1C.Dot(Ny), O1C.Dot(Nx));
-
-        double t = t0, u = u0, theta = theta0;
-        CollidePrimitive collision = CollideAtBezierCurve(ray_O, ray_V, t, u, theta);
-        if (collision.isCollide && collision.dist < ret.dist) {
-            ret = collision;
-        }
-
-        for (int j = 0; j < RANDOM_INITIALIZATION / collisionCount; j++) {
-            t = t0 * ((1 - RAND_AMP) + 2 * RAND_AMP * ran());
-            u = ran();
-            theta = theta0 * ((1 - RAND_AMP) + 2 * RAND_AMP * ran());// -PI + 2 * PI * i / (double)RANDOM_INITIALIZATION;
-
-            collision = Bezier::CollideAtBezierCurve(ray_O, ray_V, t, u, theta);
-            if (collision.isCollide && collision.dist < ret.dist) {
-                ret = collision;
+                return ret;
             }
+
+            if ((i == 2) && ((boundCollisions[i].C - O2).Module() < R[R.size()-1] + EPS)) {
+//                ret.u = 0;
+//                ret.v = 1;
+                ret.dist = boundCollisions[i].dist;
+                ret.C = boundCollisions[i].C;
+                ret.N = boundCollisions[i].N;
+                ret.front = boundCollisions[i].front;
+
+//                ret.isAccurate = true;
+                ret.isCollide = true;
+                ret.collide_primitive = this;
+
+                return ret;
+            }
+
+
+            Vector3 delta0 = boundCollisions[i].C - O1;
+            double t0 = boundCollisions[i].dist;
+            double u0 = (delta0.Dot(N)) / (O2 - O1).Module();
+            double theta0 = atan2(delta0.Dot(Ny), delta0.Dot(Nx));// return value [-PI, PI]
+
+            double t = t0, u = u0, theta = theta0;
+
+            CollidePrimitive collision = Bezier::CollideAtBezierCurve(ray_O, ray_V, t, u, theta);
+            if (collision.isCollide)
+                if (collision.dist < ret.dist)
+                    ret = collision;
+
+            //Init with random params
+//            for (int i = 0; i < RANDOM_INITIALIZATION / collisionCnt; i++) {
+//                t = t0 * ((1 - RAND_AMP) + 2 * RAND_AMP * ran());
+//                u = ran();
+//                theta = theta0 * ((1 - RAND_AMP) + 2 * RAND_AMP * ran());// -PI + 2 * PI * i / (double)RANDOM_INITIALIZATION;
+//
+//                //u = ran();
+//                //Plane ranPlane(N, Nx, Ny, -N.Dot(O1 + u * (O2 - O1)));
+//                //CollidePrimitive planeCollision = ranPlane.Collide(ray_O, ray_V);
+//                //if (!planeCollision.isCollide) continue;
+//                //t = planeCollision.dist;
+//                //Vector3 delta = planeCollision.C - O1;
+//                //theta = -PI + 2 * PI * i / (double)RANDOM_INITIALIZATION;
+//
+//                CollidePrimitive collision = Bezier::CollideAtBezierCurve(ray_O, ray_V, t, u, theta);
+//                if (collision.isCollide)
+//                    if (collision.dist < ret.dist)
+//                        ret = collision;
+//            }
         }
     }
-
-    return ret;
-}
-
-CollidePrimitive Bezier::CollideAtBezierCurve(Vector3 ray_O, Vector3 ray_V, double t, double u, double theta) {
-    CollidePrimitive ret;
-    Eigen::Vector3d args(t, u, theta);
-    bool isZero = false;
-
-    // 牛顿迭代法求 函数F(t,u,θ) 的零点
-    for (int i = 0; i < MAX_NEWTON_ITERATION; i++) {
-        t = args.x(), u = args.y(), theta = args.z();
-
-        if (u < -0.5 || u > 1.5) break;
-
-        Eigen::Vector3d F = Bezier::F(t, u, theta, ray_O, ray_V).ToEigenLibForm();
-        Eigen::Matrix3d dF = Bezier::dF(t, u, theta, ray_V);
-
-        if (F.norm() < EPS) {
-            isZero = true;
-            break;
-        }
-
-        args = args - LEARNING_RATE * (dF.inverse() * F);
-    }
-
-    if (!isZero) return ret;
-    if (t < -EPS) return ret;
-    if (u < -EPS || u > 1 + EPS) return ret;
-
-    Vector3 dS_u = dP(u, Z) * (O2 - O1) +
-                   dP(u, R) * (cos(theta) * Nx + sin(theta) * Ny);
-    Vector3 dS_theta = P(u, R) * (-sin(theta) * Nx + cos(theta) * Ny);
-
-    ret.dist = t;
-    ret.C = C(t, ray_O, ray_V);
-    ret.N = (dS_theta * dS_u).GetUnitVector();
-    ret.front = (ret.N).Dot(ray_V) < 0;
-    if (ret.front == false) ret.N = -ret.N;
-    ret.isCollide = true;
-    ret.collide_primitive = this;
     return ret;
 }
 
@@ -543,52 +521,95 @@ Color Bezier::GetTexture(Vector3 crash_C) {
     return material->texture->GetSmoothColor(u, v);
 }
 
-double Bezier::B(double u, int n, int i) {
-    // B_i,n(u) = C_n,i * u^i * (1-u)^(n-i)
-    return Combination[n][i] * pow(u, i) * pow(1 - u, n - i);
-}
+CollidePrimitive Bezier::CollideAtBezierCurve( Vector3 ray_O , Vector3 ray_V , double t, double u, double theta) {
+    CollidePrimitive ret;
+    Eigen::Vector3d args(t,u,theta);
 
-double Bezier::P(double u, std::vector<double> ctrlPointsComponents) {
-    // b_n(u) = Σb_j * B_j,n(u)
-    double componentValue = 0.0;
-    for (int i = 0; i < degree + 1; i++) {
-        componentValue += B(u, degree, i) * ctrlPointsComponents[i];
+    bool isFZero = false;
+
+    for(int i = 0; i < MAX_NEWTON_ITERATION; i++){
+        t = args.x();
+        u = args.y();
+        theta = args.z();
+        //std::cout << t << "," << u << "," << theta << std::endl;
+        if (u<-.5 || u>1.5)break;
+
+        Eigen::Vector3d F = Bezier::F(t,u,theta,ray_O,ray_V).ToEigenLibForm();
+        Eigen::Matrix3d dF = Bezier::dF(t,u,theta,ray_V);
+        if (F.norm() < 1e-3) {
+            isFZero = true;
+            break;
+        }
+        args = args - (dF.inverse() * F) * LEARNING_RATE;
     }
-    return componentValue;
+
+    if (!isFZero) return ret;
+    if (t < -EPS) return ret;
+//    if (u < -EPS || u > 1 + EPS) return ret;
+
+//    ret.u = std::fmod(theta, 2 * PI);
+//    ret.v = u;
+    ret.dist = t;
+    ret.C = C(t, ray_O, ray_V);
+    Vector3 dS_u = dP(u, Z) * (O2 - O1) +
+                   dP(u, R) * ( cos(theta) * Nx + sin(theta) * Ny);
+    Vector3 dS_theta = P(u, R) * ( - sin(theta) * Nx + cos(theta) * Ny);
+    ret.N = (dS_theta * dS_u).GetUnitVector();
+    ret.front = (ret.N).Dot(ray_V) < -EPS;
+    ret.N *= (ret.front ? 1 : -1);
+
+    //std::cout << ret.C.x << "," << ret.C.y << "," << ret.C.z << std::endl;
+    //std::cout << ret.N.x << "," << ret.N.y << "," << ret.N.z << std::endl;
+
+//    ret.isAccurate = false;
+    ret.isCollide = true;
+    ret.collide_primitive = this;
+
+    return ret;
 }
 
-double Bezier::dP(double u, std::vector<double> ctrlPointsComponents) {
-    double componentValue = 0.0;
-    for (int i = 0; i < degree; i++) {
-        componentValue += B(u, degree - 1, i) * (ctrlPointsComponents[i + 1] - ctrlPointsComponents[i]);
+double Bezier::B(double u, int n, int i){
+    return Combination[n][i] * pow(1-u,n-i) * pow(u,i);
+}
+
+double Bezier::P(double u, std::vector<double> ctrlPoints){
+    double ret = 0.0;
+    for(int i=0; i < degree+1; i++){
+        ret += B(u,degree,i) * ctrlPoints[i] ;
     }
-    componentValue *= degree;
-    return componentValue;
+    return ret;
 }
 
-Vector3 Bezier::C(double t, Vector3 ray_O, Vector3 ray_V) {
+double Bezier::dP(double u, std::vector<double> ctrlPoints){
+    double ret = 0.0;
+    for(int i=0; i < degree; i++){
+        ret += B(u,degree-1,i) * (ctrlPoints[i+1]-ctrlPoints[i]);
+    }
+    ret = ret * degree;
+    return ret;
+}
+
+Vector3 Bezier::C(double t, Vector3 ray_O , Vector3 ray_V){
     return ray_O + t * ray_V;
 }
 
-Vector3 Bezier::S(double u, double theta) {
+Vector3 Bezier::S(double u, double theta){
     return O1 +
-           P(u, Z) * (O2 - O1) +                           // 在包围圆柱高度上的投影
-           P(u, R) * (cos(theta) * Nx + sin(theta) * Ny);  // 在包围圆柱地面上的投影
+           P(u, Z) * (O2 - O1) +
+           P(u, R) * ( cos(theta) * Nx + sin(theta) * Ny);
 }
 
-Vector3 Bezier::F(double t, double u, double theta, Vector3 ray_O, Vector3 ray_V) {
-    return S(u, theta) - C(t, ray_O, ray_V);
+Vector3 Bezier::F(double t, double u, double theta, Vector3 ray_O , Vector3 ray_V){
+    return S(u,theta) - C(t, ray_O, ray_V);
 }
 
-Eigen::Matrix3d Bezier::dF(double t, double u, double theta, Vector3 ray_V) {
+Eigen::Matrix3d Bezier::dF(double t, double u, double theta, Vector3 ray_V){
     Vector3 dF_t = -ray_V;
     Vector3 dF_u = dP(u, Z) * (O2 - O1) +
-                   dP(u, R) * (cos(theta) * Nx + sin(theta) * Ny);
-    Vector3 dF_theta = P(u, R) * (-sin(theta) * Nx + cos(theta) * Ny);
+                   dP(u, R) * ( cos(theta) * Nx + sin(theta) * Ny);
+    Vector3 dF_theta = P(u, R) * ( - sin(theta) * Nx + cos(theta) * Ny);
 
-    Eigen::Matrix3d matrix(3, 3);
-    // 以列向量的方式输入矩阵中
-    matrix << dF_t.ToEigenLibForm(), dF_u.ToEigenLibForm(), dF_theta.ToEigenLibForm();
-    return matrix;
+    Eigen::Matrix3d ret(3,3);
+    ret << dF_t.ToEigenLibForm(), dF_u.ToEigenLibForm(), dF_theta.ToEigenLibForm();// init as column vectors
+    return ret;
 }
-

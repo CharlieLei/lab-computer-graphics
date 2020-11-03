@@ -41,7 +41,7 @@ primitive sphere
 end
 
 
-primitive bezier0
+primitive bezier
 	O1= 0 5 -1.8
 	O2= 0 5 -1.2
 	P= 0 0.01

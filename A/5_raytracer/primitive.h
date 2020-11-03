@@ -72,6 +72,7 @@ struct CollidePrimitive {
 	Vector3 N , C;
 	double dist;
 	bool front;
+    bool isAccurate;
 	CollidePrimitive(){isCollide = false; collide_primitive = NULL; dist = BIG_DIST;}
 	Color GetTexture(){return collide_primitive->GetTexture(C);}
 };
