@@ -10,6 +10,8 @@ const int MAX_RAYTRACING_DEP = 10;
 const int HASH_FAC = 7;
 const int HASH_MOD = 10000007;
 
+const double COLLIDE_POINT_OFFSET_ALPHA = 0.01;
+
 Raytracer::Raytracer() {
 	light_head = NULL;
 	background_color = Color();
@@ -17,7 +19,10 @@ Raytracer::Raytracer() {
 }
 
 Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) {
-    if (!collide_primitive.isAccurate) collide_primitive.C += collide_primitive.N * 0.01;
+    if (!collide_primitive.isAccurate) {
+        // 当交点不准确时，将交点沿法线向外移动一点，避免交点在物体内部
+        collide_primitive.C += collide_primitive.N * COLLIDE_POINT_OFFSET_ALPHA;
+    }
 	Primitive* primitive = collide_primitive.collide_primitive;
 	Color color = primitive->GetMaterial()->color;
 	if ( primitive->GetMaterial()->texture != NULL ) color = color * collide_primitive.GetTexture();
@@ -53,7 +58,10 @@ Color Raytracer::CalnDiffusion(CollidePrimitive collide_primitive , int* hash ) 
 }
 
 Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray_V , int dep , int* hash ) {
-    if (!collide_primitive.isAccurate) collide_primitive.C += collide_primitive.N * 0.01;
+    if (!collide_primitive.isAccurate) {
+        // 当交点不准确时，将交点沿法线向外移动一点，避免交点在物体内部
+        collide_primitive.C += collide_primitive.N * COLLIDE_POINT_OFFSET_ALPHA;
+    }
 	ray_V = ray_V.Reflect( collide_primitive.N );
 	Primitive* primitive = collide_primitive.collide_primitive;
 
@@ -82,7 +90,10 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 }
 
 Color Raytracer::CalnRefraction(CollidePrimitive collide_primitive , Vector3 ray_V , int dep , int* hash ) {
-    if (!collide_primitive.isAccurate) collide_primitive.C -= collide_primitive.N * 0.01;
+    if (!collide_primitive.isAccurate) {
+        // 当交点不准确时，将交点沿法线向内移动一点，避免交点在物体外部
+        collide_primitive.C -= collide_primitive.N * COLLIDE_POINT_OFFSET_ALPHA;
+    }
 	Primitive* primitive = collide_primitive.collide_primitive;
 	double n = primitive->GetMaterial()->rindex;
 	if ( collide_primitive.front ) n = 1 / n;
