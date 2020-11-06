@@ -100,7 +100,7 @@ void main()
 
 ### 二、实验步骤
 
-直接执行1_triangle.exe（确保四个glsl文件和exe文件在同一个文件夹中）
+直接执行1_triangle.exe**（确保四个glsl文件在``Code``文件夹中且exe文件在``Output``文件夹中）**
 
 ### 三、实验效果
 
