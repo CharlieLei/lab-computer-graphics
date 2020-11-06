@@ -45,8 +45,8 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader triangleShader("triangleVertex.glsl", "triangleFrag.glsl");
-	Shader quadrangleShader("quadrangleVertex.glsl", "quadrangleFrag.glsl");
+	Shader triangleShader("../Code/triangleVertex.glsl", "../Code/triangleFrag.glsl");
+	Shader quadrangleShader("../Code/quadrangleVertex.glsl", "../Code/quadrangleFrag.glsl");
 
 	// vertices of triangle
 	// --------------------
