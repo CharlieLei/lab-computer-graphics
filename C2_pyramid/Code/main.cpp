@@ -26,10 +26,6 @@ const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(SCR_WIDTH, SCR_HEIGHT,glm::vec3(-1.0, 1.0, 7.0));
 
-// timing
-float deltaTime = 0.0;
-float lastFrame = 0.0;
-
 // lighting
 glm::vec3 lightPos(0.0, 2.0, 5.0);
 
