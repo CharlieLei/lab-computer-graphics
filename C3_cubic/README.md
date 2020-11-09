@@ -2,9 +2,17 @@
 
 ### 一、实验效果
 
-![result](Report\result.png)
+#### 1.1 正方体各个面
 
 ![result](Report\result2.png)
+
+#### 1.2 近处纹理
+
+![result](Report\result.png)
+
+#### 1.3 远处纹理
+
+![result](Report\result3.png)
 
 
 
@@ -54,14 +62,18 @@ for (int i = 0; i < 6; i++) {
 
 #### 4.2 加载纹理
 
-使用stb_image库将纹理图片加载到程序中。
+使用stb_image.h库将纹理图片加载到程序中。
 
 之后根据采样方式设置纹理过滤参数。
 
 ```c++
-// param为GL_LINEAR、GL_LINEAR_MIPMAP_LINEAR或GL_NEAREST
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
+if (param == GL_LINEAR_MIPMAP_LINEAR) {
+    // 纹理放大不会使用Mipmap
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+} else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
+}
 ```
 
 #### 4.3 交互
@@ -87,5 +99,3 @@ if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
         diffuseMaps[i] = loadTexture(paths[i], GL_NEAREST);
 }
 ```
-
-#### 

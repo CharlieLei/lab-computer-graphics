@@ -263,7 +263,11 @@ unsigned int loadTexture(string path, GLint param) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
+        if (param == GL_LINEAR_MIPMAP_LINEAR) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // 纹理放大不会使用Mipmap
+        } else {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
+        }
     } else {
         std::cerr << "Texture failed to load at path: " << path << std::endl;
     }
