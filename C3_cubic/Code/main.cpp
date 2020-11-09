@@ -6,11 +6,15 @@
 
 #include <iostream>
 
-#include "Shader.h"
-#include "Camera.h"
-#include "stb_image.h"
+#include "tool/Shader.h"
+#include "tool/Camera.h"
+#include "tool/stb_image.h"
 
 using namespace std;
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void processInput(GLFWwindow *window);
 
@@ -21,19 +25,15 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
-// timing
-float deltaTime = 0.0;
-float lastFrame = 0.0;
+Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f));
 
 string paths[] = {
-        "../texture/bricks2.jpg",
-        "../texture/container.jpg",
-        "../texture/container2.png",
-        "../texture/marble.jpg",
-        "../texture/wall.jpg",
-        "../texture/wood.png",
+        "../Code/texture/bricks2.jpg",
+        "../Code/texture/container.jpg",
+        "../Code/texture/container2.png",
+        "../Code/texture/marble.jpg",
+        "../Code/texture/wall.jpg",
+        "../Code/texture/wood.png",
 };
 
 unsigned int diffuseMaps[6];
@@ -48,13 +48,18 @@ int main() {
 
     // glfw window creation
     // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "1.Triangle", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "C3.Cubic", nullptr, nullptr);
     if (window == nullptr) {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+
+    // tell GLFW to capture our mouse
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -69,7 +74,7 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader shader("../vertex.glsl", "../fragment.glsl");
+    Shader shader("../Code/vertex.glsl", "../Code/fragment.glsl");
 
     // vertices of cubic
     // ----------------------
@@ -154,9 +159,7 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         // per-frame time logic
         // --------------------
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        Timer::refresh();
 
         // input
         // -----
@@ -204,33 +207,41 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        camera.ProcessKeyboard(FORWARD);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        camera.ProcessKeyboard(BACKWARD);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        camera.ProcessKeyboard(LEFT);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.ProcessMouseMovement(-0.1, 0.0);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.ProcessMouseMovement(0.1, 0.0);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera.ProcessMouseMovement(0.0, 0.1);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera.ProcessMouseMovement(0.0, -0.1);
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        camera.ProcessKeyboard(RIGHT);
+
+    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
         cout << "TEXTURE::LINEAR" << endl;
-        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR);
+        for (int i = 0; i < 6; i++)
+            diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR);
     }
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
         cout << "TEXTURE::MIPMAP" << endl;
-        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR_MIPMAP_LINEAR);
+        for (int i = 0; i < 6; i++)
+            diffuseMaps[i] = loadTexture(paths[i], GL_LINEAR_MIPMAP_LINEAR);
     }
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
         cout << "TEXTURE::NEAREST" << endl;
-        for (int i = 0; i < 6; i++) diffuseMaps[i] = loadTexture(paths[i], GL_NEAREST);
+        for (int i = 0; i < 6; i++)
+            diffuseMaps[i] = loadTexture(paths[i], GL_NEAREST);
     }
+}
+
+// glfw: 鼠标移动回调函数
+// --------------------
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    camera.ProcessMouseMovement(xpos, ypos, true);
+}
+
+// glfw: 修改窗口尺寸
+// ----------------
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
 unsigned int loadTexture(string path, GLint param) {
