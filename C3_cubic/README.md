@@ -4,15 +4,15 @@
 
 #### 1.1 正方体各个面
 
-![result](Report\result2.png)
+![result](Report/result2.png)
 
 #### 1.2 近处纹理
 
-![result](Report\result.png)
+![result](Report/result.png)
 
 #### 1.3 远处纹理
 
-![result](Report\result3.png)
+![result](Report/result3.png)
 
 
 

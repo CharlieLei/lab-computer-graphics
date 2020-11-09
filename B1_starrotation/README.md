@@ -2,7 +2,7 @@
 
 ### 一、实验效果
 
-<img src="Report/result.png" alt="结果展示"/>
+![result](Report/result.png)
 
 
 

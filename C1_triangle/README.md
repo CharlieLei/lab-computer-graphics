@@ -2,7 +2,7 @@
 
 ### 一、实验效果
 
-![1_triangle](Report\1_triangle.png)
+![1_triangle](Report/1_triangle.png)
 
 
 
