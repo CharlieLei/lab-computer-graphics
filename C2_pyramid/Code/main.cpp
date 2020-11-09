@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "Shader.h"
+#include "tool/Shader.h"
 #include "tool/Camera.h"
 
 using namespace std;
@@ -178,17 +178,15 @@ void processInput(GLFWwindow *window) {
         camera.ProcessKeyboard(RIGHT);
 }
 
-// glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
+// glfw: 鼠标移动回调函数
+// --------------------
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     camera.ProcessMouseMovement(xpos, ypos, true);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
+// glfw: 修改窗口尺寸
+// ----------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 

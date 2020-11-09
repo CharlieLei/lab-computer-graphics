@@ -11,11 +11,11 @@ add_executable(C2_pyramid
         glad.c
         main.cpp
 
-        Shader.h
+        tool/Shader.h
         tool/Camera.h
         tool/Timer.h
 
-        Shader.cpp
+        tool/Shader.cpp
         tool/Camera.cpp
         tool/Timer.cpp)
 
