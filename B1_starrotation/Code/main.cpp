@@ -30,7 +30,7 @@ int main() {
 
     // glfw window creation
     // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "1.Triangle", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "B1.StarRotation", nullptr, nullptr);
     if (window == nullptr) {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -52,11 +52,11 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader shader("../vertex.glsl", "../fragment.glsl");
+    Shader shader("../Code/vertex.glsl", "../Code/fragment.glsl");
 
     // texture
     // -------
-    Texture texture("../Star.bmp");
+    Texture texture("../Code/Star.bmp");
 
     // model of star
     // ----------------------
@@ -122,13 +122,13 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
         spiralType = ARCHIMEDEAN;
     }
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
         spiralType = LOGARITHMIC;
     }
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
         spiralType = FERMAT;
     }
 }
