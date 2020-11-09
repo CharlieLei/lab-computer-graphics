@@ -172,8 +172,7 @@ int main() {
 
         glm::mat4 model(1.0);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
-                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = camera.GetProjectionMatrix();
 
         shader.setMat4("model", model);
         shader.setMat4("view", view);
