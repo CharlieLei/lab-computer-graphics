@@ -6,8 +6,8 @@
 
 #include <iostream>
 
-#include "Shader.h"
-#include "Texture.h"
+#include "tool/Shader.h"
+#include "tool/Texture.h"
 #include "Star.h"
 
 using namespace std;

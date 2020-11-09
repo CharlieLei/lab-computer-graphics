@@ -7,6 +7,6 @@ include_directories(include)
 
 link_directories(lib/glfw)
 
-add_executable(B1_starrotation glad.c main.cpp Shader.cpp Shader.h Texture.cpp Texture.h stb_image.cpp stb_image.h Star.cpp Star.h)
+add_executable(B1_starrotation glad.c main.cpp tool/Shader.cpp tool/Shader.h tool/Texture.cpp tool/Texture.h tool/stb_image.cpp tool/stb_image.h Star.cpp Star.h)
 
 target_link_libraries(B1_starrotation opengl32 glfw3)
