@@ -2,7 +2,7 @@
 
 ### 一、实验效果
 
-![C2_pyramid](Report/C2_pyramid.png)
+![C2_pyramid](Report/result.png)
 
 
 
