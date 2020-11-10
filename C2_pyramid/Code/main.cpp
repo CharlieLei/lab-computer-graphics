@@ -136,11 +136,16 @@ int main() {
         shader.setMat4("projection", projection);
         shader.setVec3("viewPos", camera.Position);
         shader.setVec3("light.position", lightPos);
+//        shader.setVec3("light.intensity", 5.0, 5.0, 5.0);
+//        shader.setVec3("material.ambient", 0.2, 0.2, 0.2);
+//        shader.setVec3("material.diffuse",  0.8, 0.8, 0.8);
+//        shader.setVec3("material.specular", 1.0, 1.0, 1.0);
+//        shader.setFloat("material.shininess", 32.0);
         shader.setVec3("light.intensity", 5.0, 5.0, 5.0);
-        shader.setVec3("material.ambient", 0.2, 0.2, 0.2);
-        shader.setVec3("material.diffuse",  0.8, 0.8, 0.8);
-        shader.setVec3("material.specular", 1.0, 1.0, 1.0);
-        shader.setFloat("material.shininess", 32.0);
+        shader.setVec3("material.ambient", 	0.2125,	0.1275,	0.054);
+        shader.setVec3("material.diffuse",  0.714,	0.4284,	0.18144);
+        shader.setVec3("material.specular", 0.393548,	0.271906,	0.166721);
+        shader.setFloat("material.shininess", 25.6);
 
         // draw pyramid
         // -------------
