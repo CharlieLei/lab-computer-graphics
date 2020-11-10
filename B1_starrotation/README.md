@@ -18,7 +18,8 @@ Windows 10， OpenGL 3.3
 
 #### 3.1 启动程序
 
-直接执行``Output``文件夹中的B1_starrotation.exe**（确保glsl文件在``Code``文件夹中且exe文件在``Output``文件夹中）**
+直接执行``Output``文件夹中的B1_starrotation.exe
+**（确保glsl文件在``Code``文件夹中且exe文件在``Output``文件夹中）**
 
 #### 3.2 交互方式
 

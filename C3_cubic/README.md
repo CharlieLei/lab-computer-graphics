@@ -28,7 +28,8 @@ Windows 10， OpenGL 3.3
 
 #### 3.1 启动程序
 
-直接执行``Output``文件夹中的C3_cubic.exe**（确保glsl文件在``Code``文件夹中，纹理图片文件在``Code/texture``文件夹中，exe文件在``Output``文件夹中）**
+直接执行``Output``文件夹中的C3_cubic.exe
+**（确保glsl文件在``Code``文件夹中，纹理图片文件在``Code/texture``文件夹中，exe文件在``Output``文件夹中）**
 
 #### 3.2 交互方式
 

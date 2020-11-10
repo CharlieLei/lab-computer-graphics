@@ -19,7 +19,6 @@ Windows 10， OpenGL 3.3
 #### 3.1 启动程序
 
 直接执行``Output``文件夹中的B3_3dmodel.exe
-
 **（确保glsl文件在``Code/shader``文件夹中，obj文件在``Code/object``文件夹中，exe文件在``Output``文件夹中）**
 
 #### 3.2 交互方式
