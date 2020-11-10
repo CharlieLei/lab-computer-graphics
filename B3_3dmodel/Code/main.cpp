@@ -16,6 +16,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 void processInput(GLFWwindow *window);
 
 // settings
@@ -25,7 +27,12 @@ const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
 
-bool keys[1024];
+// rotation
+float LastX;
+float LastY;
+bool FirstMouse = true;
+glm::vec3 rotationVec(0.0);
+double scaleFactor = 1.0;
 
 bool showVertices = true;
 bool showMeshes = true;
@@ -35,8 +42,8 @@ int main() {
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // glfw window creation
@@ -50,6 +57,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -67,11 +75,11 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader shader("../shader/vertex.glsl", "../shader/fragment.glsl");
+    Shader shader("../Code/shader/vertex.glsl", "../Code/shader/fragment.glsl");
 
     // vertices of cubic
     // ----------------------
-    Model aModel("../object/eight.uniform.obj");
+    Model aModel("../Code/object/eight.uniform.obj");
 
 
     // render loop
@@ -91,7 +99,10 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model(1.0);
-//        model = glm::scale(model, glm::vec3(0.1,0.1,0.1));
+        model = glm::rotate(model, glm::radians(rotationVec.z), glm::vec3(0.0, 0.0, 1.0));
+        model = glm::rotate(model, glm::radians(rotationVec.y), glm::vec3(0.0, 1.0, 0.0));
+        model = glm::rotate(model, glm::radians(rotationVec.x), glm::vec3(1.0, 0.0, 0.0));
+        model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = camera.GetProjectionMatrix();
 
@@ -110,6 +121,7 @@ int main() {
             glPolygonOffset(-1,-1);
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             aModel.Draw(shader, model, view, projection, glm::vec3(0.0));
+            glDisable(GL_POLYGON_OFFSET_POINT);
         }
 
         if (showFaces) {
@@ -167,7 +179,26 @@ void processInput(GLFWwindow *window) {
 // glfw: 鼠标移动回调函数
 // --------------------
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    camera.ProcessMouseMovement(xpos, ypos, true);
+    if (FirstMouse) {
+        LastX = xpos;
+        LastY = ypos;
+        FirstMouse = false;
+    }
+
+    float xoffset = xpos - LastX;
+    float yoffset = LastY - ypos; // reversed since y-coordinates go from bottom to top
+    rotationVec += glm::vec3(-yoffset * 0.5, xoffset * 0.5, 0.0);
+
+    LastX = xpos;
+    LastY = ypos;
+}
+
+// glfw: 鼠标滚轮回调函数
+// --------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    scaleFactor += yoffset * 0.1;
+    scaleFactor = max(0.1, min(scaleFactor, 10.0)); // 设置最大最小缩小比例
 }
 
 // glfw: 修改窗口尺寸
