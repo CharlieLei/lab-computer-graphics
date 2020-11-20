@@ -34,14 +34,14 @@ private:
     unsigned int waveVAO, waveVBO;
 
     std::vector<std::string> paths = {
-            "../texture/Skybox/SkyBox0.bmp",
-            "../texture/Skybox/SkyBox2.bmp",
-            "../texture/Skybox/SkyBox3.bmp",
-            "../texture/Skybox/SkyBox1.bmp",
-            "../texture/Skybox/SkyBox4.bmp"
+            "../Code/texture/Skybox/SkyBox0.bmp",
+            "../Code/texture/Skybox/SkyBox2.bmp",
+            "../Code/texture/Skybox/SkyBox3.bmp",
+            "../Code/texture/Skybox/SkyBox1.bmp",
+            "../Code/texture/Skybox/SkyBox4.bmp"
     };
 
-    std::string wavePath = "../texture/Skybox/SkyBox5.bmp";
+    std::string wavePath = "../Code/texture/Skybox/SkyBox5.bmp";
 
     float vertices[FACES][DIMENSION] = {
             // front

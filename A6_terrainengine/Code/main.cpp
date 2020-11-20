@@ -63,10 +63,10 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader skyboxShader("../shader/skyboxVertex.glsl", "../shader/skyboxFrag.glsl");
+    Shader skyboxShader("../Code/shader/skyboxVertex.glsl", "../Code/shader/skyboxFrag.glsl");
     Skybox skybox;
 
-    Shader terrainShader("../shader/terrainVertex.glsl", "../shader/terrainFrag.glsl");
+    Shader terrainShader("../Code/shader/terrainVertex.glsl", "../Code/shader/terrainFrag.glsl");
     Terrain terrain;
 
     skybox.setTexture(skyboxShader);

@@ -10,5 +10,5 @@ void main()
 {
     vec4 terrainColor = texture(terrainTexture, TexCoords);
     vec4 detailColor = texture(detailTexture, TexCoords * vec2(20.0f, 20.0f));
-    FragColor = terrainColor * detailColor;
+    FragColor = terrainColor * detailColor * vec4(2.0, 2.0, 2.0, 1.0);
 }

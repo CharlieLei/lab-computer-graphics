@@ -48,7 +48,7 @@ void Terrain::Draw(Shader &shader, Camera &camera) {
 
 void Terrain::DrawReflection(Shader &shader, Camera &camera) {
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0, DOWN_OFFSET + 0.5, 0.0));
+    model = glm::translate(model, glm::vec3(0.0, DOWN_OFFSET, 0.0));
     model = glm::scale(model, glm::vec3(1.0, -1.0, 1.0));
     model = glm::translate(model, glm::vec3(0.0, DOWN_OFFSET, 0.0));
     glm::mat4 view = camera.GetViewMatrix();

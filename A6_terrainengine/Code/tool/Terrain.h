@@ -38,9 +38,9 @@ public:
 private:
     unsigned int VAO, VBO, EBO;
 
-    const char *heightPath = "../texture/heightmap.bmp";
-    const char *terrainPath = "../texture/terrain-texture3.bmp";
-    const char *terrainDetailPath = "../texture/detail.bmp";
+    const char *heightPath = "../Code/texture/heightmap.bmp";
+    const char *terrainPath = "../Code/texture/terrain-texture3.bmp";
+    const char *terrainDetailPath = "../Code/texture/detail.bmp";
 
     std::vector<Vertex> vertices; // 每个像素需要6个点，每个点需要5个float值
     std::vector<unsigned int> indices;
