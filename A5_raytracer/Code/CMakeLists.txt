@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.17)
-project(5_raytracer)
+project(A5_raytracer)
 
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(Eigen)
 
-add_executable(5_raytracer
+add_executable(A5_raytracer
         main.cpp
         bmp.cpp
         bmp.h
