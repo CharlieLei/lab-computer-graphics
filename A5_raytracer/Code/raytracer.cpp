@@ -11,7 +11,7 @@ const int HASH_FAC = 7;
 const int HASH_MOD = 10000007;
 
 const double COLLIDE_POINT_OFFSET_ALPHA = 0.01;
-const int DISTRIBUTED_REFLECTION_COUNT = 1;//16;
+const int DISTRIBUTED_REFLECTION_COUNT = 16;
 
 Raytracer::Raytracer() {
 	light_head = NULL;
