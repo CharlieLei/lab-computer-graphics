@@ -51,7 +51,7 @@ double SquareLight::CalnShade(Vector3 C, Primitive *primitive_head, int shade_qu
     double length = Dx.Module(), width = Dy.Module();
 
     int shadeCount = 0; // 被遮挡的采样点个数
-    int sampleCount = SAMPLE_COUNT * shade_quality;
+    int sampleCount = shade_quality;
     for (int i = 0; i < sampleCount; i++) {
         double x = length * (2.0 * ran() - 1.0), y = width * (2.0 * ran() - 1.0);
         Vector3 lightPoint = O + x * xDir + y * yDir;
@@ -92,7 +92,7 @@ double SphereLight::CalnShade(Vector3 C, Primitive *primitive_head, int shade_qu
     Vector3 yDir = (zDir * xDir).GetUnitVector();
 
     int shadeCount = 0; // 被遮挡的采样点个数
-    int sampleCount = SAMPLE_COUNT * shade_quality;
+    int sampleCount = shade_quality;
     // 判断是否碰撞的物体中有光源
     for (int i = 0; i < sampleCount; i++) {
         // 极坐标的r要开根的原因：

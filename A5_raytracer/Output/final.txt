@@ -5,8 +5,8 @@ end
 camera
 	O= 0 1 4
 	N= 0 0 -1
-	shade_quality= 1
-	drefl_quality= 1
+	shade_quality= 1024
+	drefl_quality= 16
 	image_H= 760
 	image_W= 1280
 	lens_H= 0.6

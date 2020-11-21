@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -19,8 +20,18 @@ int main() {
 
     raytracer->SetInput(scenePath);
     raytracer->SetOutput(outputPath);
+
+    clock_t startTime,endTime;
+    startTime = clock();
+    std::cout << "Start Time: " << startTime << std::endl;
+
 //	raytracer->Run();
     raytracer->MultiThreadRun();
 //	raytracer->DebugRun(740,760,410,430);
+
+    endTime = clock();
+    std::cout << "End Time: " << endTime << std::endl;
+    std::cout << "Total Time: " << (double)(endTime - startTime) / CLOCKS_PER_SEC << "s" << std::endl;
+
     return 0;
 }

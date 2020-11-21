@@ -63,7 +63,7 @@ Windows 10
 
 ```c++
 int shadeCount = 0;
-int sampleCount = SAMPLE_COUNT * shade_quality;
+int sampleCount = shade_quality;
 for (int i = 0; i < sampleCount; i++) {
     double x = length * (2.0 * ran() - 1.0), y = width * (2.0 * ran() - 1.0);
     Vector3 lightPoint = O + x * xDir + y * yDir;
@@ -129,7 +129,7 @@ Vector3 yDir = (xDir * N).GetUnitVector();
 double z = ray_V.Dot(N);
 
 Color ret;
-for (int k = 0; k < DISTRIBUTED_REFLECTION_COUNT * camera->GetDreflQuality(); k++) {
+for (int k = 0; k < camera->GetDreflQuality(); k++) {
     double x, y;
     x = primitive->GetMaterial()->blur->GetXY().first * primitive->GetMaterial()->drefl;
     y = primitive->GetMaterial()->blur->GetXY().second * primitive->GetMaterial()->drefl;

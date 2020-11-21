@@ -11,7 +11,6 @@ const int HASH_FAC = 7;
 const int HASH_MOD = 10000007;
 
 const double COLLIDE_POINT_OFFSET_ALPHA = 0.01;
-const int DISTRIBUTED_REFLECTION_COUNT = 16;
 
 Raytracer::Raytracer() {
 	light_head = NULL;
@@ -79,14 +78,14 @@ Color Raytracer::CalnReflection(CollidePrimitive collide_primitive , Vector3 ray
 	    double z = ray_V.Dot(N);
 	    // 采样
 	    Color ret;
-        for (int k = 0; k < DISTRIBUTED_REFLECTION_COUNT * camera->GetDreflQuality(); k++) {
+        for (int k = 0; k < camera->GetDreflQuality(); k++) {
             double x, y;
             x = primitive->GetMaterial()->blur->GetXY().first * primitive->GetMaterial()->drefl;
             y = primitive->GetMaterial()->blur->GetXY().second * primitive->GetMaterial()->drefl;
             ray_V = x * xDir + y * yDir + z * N;
             ret += RayTracing(collide_primitive.C, ray_V, dep + MAX_DREFL_DEP, NULL);
         }
-	    ret /= DISTRIBUTED_REFLECTION_COUNT * camera->GetDreflQuality(); // 求平均
+	    ret /= camera->GetDreflQuality(); // 求平均
 		return ret * primitive->GetMaterial()->color * primitive->GetMaterial()->refl;
 	}
 }
@@ -227,27 +226,33 @@ void Raytracer::Run() {
 
 	for ( int i = 0 ; i < H ; std::cout << "Sampling:   " << ++i << "/" << H << std::endl )
 //	for(int i=0;i<H;i++)
-		for ( int j = 0 ; j < W ; j++ ) {
-			Vector3 ray_V = camera->Emit( i , j ); // 从摄像机出发向像素(i, j)发射的光线的方向向量
-			Color color = RayTracing( ray_O , ray_V , 1 , &sample[i][j] );
-			camera->SetColor( i , j , color );
+    {
+        for ( int j = 0 ; j < W ; j++ ) {
+            Vector3 ray_V = camera->Emit( i , j ); // 从摄像机出发向像素(i, j)发射的光线的方向向量
+            Color color = RayTracing( ray_O , ray_V , 1 , &sample[i][j] );
+            camera->SetColor( i , j , color );
 
-		}
+        }
+        std::cout << std::endl;
+    }
 
 	for ( int i = 0 ; i < H ; std::cout << "Resampling: " << ++i << "/" << H << std::endl )
 //	for(int i=0;i<H;i++)
-		for ( int j = 0 ; j < W ; j++ ) {
-			if ( ( i == 0 || sample[i][j] == sample[i - 1][j] ) && ( i == H - 1 || sample[i][j] == sample[i + 1][j] ) &&
-			     ( j == 0 || sample[i][j] == sample[i][j - 1] ) && ( j == W - 1 || sample[i][j] == sample[i][j + 1] ) ) continue;
+    {
+        for ( int j = 0 ; j < W ; j++ ) {
+            if ( ( i == 0 || sample[i][j] == sample[i - 1][j] ) && ( i == H - 1 || sample[i][j] == sample[i + 1][j] ) &&
+                 ( j == 0 || sample[i][j] == sample[i][j - 1] ) && ( j == W - 1 || sample[i][j] == sample[i][j + 1] ) ) continue;
 
-			Color color;
-			for ( int r = -1 ; r <= 1 ; r++ )
-				for ( int c = -1 ; c <= 1 ; c++ ) {
-					Vector3 ray_V = camera->Emit( i + ( double ) r / 3 , j + ( double ) c / 3 );
-					color += RayTracing( ray_O , ray_V , 1 , NULL ) / 9;
-				}
-			camera->SetColor( i , j , color );
-		}
+            Color color;
+            for ( int r = -1 ; r <= 1 ; r++ )
+                for ( int c = -1 ; c <= 1 ; c++ ) {
+                    Vector3 ray_V = camera->Emit( i + ( double ) r / 3 , j + ( double ) c / 3 );
+                    color += RayTracing( ray_O , ray_V , 1 , NULL ) / 9;
+                }
+            camera->SetColor( i , j , color );
+        }
+        std::cout << std::endl;
+    }
 	
 	for ( int i = 0 ; i < H ; i++ )
 		delete[] sample[i];
@@ -335,7 +340,7 @@ void Raytracer::MultiThreadRun() {
 	}
 
 	std::vector<std::thread> threads(H);
-	for ( int i = 0 ; i < H ; std::cout << "Sampling:   " << ++i << "/" << H << std::endl )
+	for ( int i = 0 ; i < H ; std::cout << "\nSampling:   " << ++i << "/" << H << std::endl )
 //	for(int i=0;i<H;i++)
 	{
 		threads[i] = std::thread(&Raytracer::MultiThreadFuncCalColor, this, i, sample);
