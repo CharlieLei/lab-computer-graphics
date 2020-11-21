@@ -138,3 +138,50 @@ for (int k = 0; k < DISTRIBUTED_REFLECTION_COUNT * camera->GetDreflQuality(); k+
 }
 ret /= DISTRIBUTED_REFLECTION_COUNT * camera->GetDreflQuality();
 ```
+
+
+
+## 五、在64位Linux下编译的一些问题
+
+在``bmp.h``中，结构体``BITMAPINFOHEADER``中有两个变量``biWidth``和``biHeight``的类型是long。
+
+```c++
+struct BITMAPINFOHEADER {
+	dword biSize;
+	long biWidth;
+	long biHeight;
+	word biPlanes;
+	word biBitCount;
+	dword biCompression;
+	dword biSizeImage;
+	long biXPelsPerMeter;
+	long biYPelsPerMeter;
+	dword biClrUsed;
+	dword biClrImportant;
+};
+```
+
+然而，64位Windows下long的长度是4个字节，而64位Linux下long的长度是8个字节，这导致程序在Linux下编译后无法获得正确的图像尺寸，最终导致在读取纹理颜色时出现越界的问题。
+
+参考：https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.0.0/com.ibm.mq.ref.dev.doc/q104610_.htm
+
+解决方式：
+
+改用dword
+
+```c++
+struct BITMAPINFOHEADER {
+	dword biSize;
+    dword biWidth;
+    dword biHeight;
+	word biPlanes;
+	word biBitCount;
+	dword biCompression;
+	dword biSizeImage;
+    dword biXPelsPerMeter;
+    dword biYPelsPerMeter;
+	dword biClrUsed;
+	dword biClrImportant;
+};
+```
+

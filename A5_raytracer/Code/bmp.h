@@ -19,14 +19,14 @@ struct BITMAPFILEHEADER {
 
 struct BITMAPINFOHEADER {
 	dword biSize;
-	long biWidth;
-	long biHeight;
+    dword biWidth;
+    dword biHeight;
 	word biPlanes;
 	word biBitCount;
 	dword biCompression;
 	dword biSizeImage;
-	long biXPelsPerMeter;
-	long biYPelsPerMeter;
+    dword biXPelsPerMeter;
+    dword biYPelsPerMeter;
 	dword biClrUsed;
 	dword biClrImportant;
 };
