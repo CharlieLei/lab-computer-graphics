@@ -6,8 +6,6 @@
 
 #define ran() ( double( rand() % 32768 ) / 32768 )
 
-const int SAMPLE_COUNT = 1024;
-
 Light::Light() {
     sample = rand();
     next = NULL;

@@ -52,7 +52,7 @@ void Camera::Initialize() {
 }
 
 Vector3 Camera::Emit( double i , double j ) {
-    std::cout << "(" << i << "," << j << ") | ";
+//    std::cout << "(" << i << "," << j << ") | ";
 	return N + Dy * ( 2 * i / H - 1 ) + Dx * ( 2 * j / W - 1 );
 }
 
