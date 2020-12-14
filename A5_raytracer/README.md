@@ -179,17 +179,17 @@ struct BITMAPINFOHEADER {
 
 ```c++
 struct BITMAPINFOHEADER {
-	dword biSize;
+    dword biSize;
     dword biWidth;
     dword biHeight;
-	word biPlanes;
-	word biBitCount;
-	dword biCompression;
-	dword biSizeImage;
+    word biPlanes;
+    word biBitCount;
+    dword biCompression;
+    dword biSizeImage;
     dword biXPelsPerMeter;
     dword biYPelsPerMeter;
-	dword biClrUsed;
-	dword biClrImportant;
+    dword biClrUsed;
+    dword biClrImportant;
 };
 ```
 
