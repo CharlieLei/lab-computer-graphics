@@ -7,6 +7,7 @@
 ![A6结果](https://user-images.githubusercontent.com/41474025/211208931-71b82015-99fb-4821-983c-2cea360e6de1.gif)
 
 ### [B1 星星旋转](B1_starrotation)
+![B1结果](https://user-images.githubusercontent.com/41474025/211209058-664d1a41-112d-43e1-ba2f-fe65e643bafb.gif)
 
 ### [B3 显示三维模型](B3_3dmodel)
 
