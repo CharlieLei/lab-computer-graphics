@@ -4,6 +4,7 @@
 ![A5结果](A5_raytracer/Report/picture_light1024_dist16.bmp)
 
 ### [A6 地形引擎](A6_terrainengine)
+![A6结果](https://user-images.githubusercontent.com/41474025/211208931-71b82015-99fb-4821-983c-2cea360e6de1.gif)
 
 ### [B1 星星旋转](B1_starrotation)
 
